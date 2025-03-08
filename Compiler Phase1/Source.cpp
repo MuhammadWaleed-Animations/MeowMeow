@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <sstream>
 #include <unordered_map>
 
 using namespace std;
@@ -38,7 +39,7 @@ private:
                 size--;
             }
         }
-        T pop()
+        void pop()
         {
             if (empty()) throw std::out_of_range("Queue is Empty");
             else
@@ -65,15 +66,53 @@ private:
             return (SIZE-size);
         }
     };
+    std::unordered_map<int, std::unordered_map<char, int>> transition_table = {
+    {0, {{'e', 1}, {'E', 1}, {'a', 1}, {'b', 1}, {'c', 1}, {'d', 1}, {'f', 1}, {'g', 1}, {'h', 1}, {'i', 1}, {'j', 1}, {'k', 1}, {'l', 1}, {'m', 1}, {'n', 1}, {'o', 1}, {'p', 1}, {'q', 1}, {'r', 1}, {'s', 1}, {'t', 1}, {'u', 1}, {'v', 1}, {'w', 1}, {'x', 1}, {'y', 1}, {'z', 1}, {'A', 1}, {'B', 1}, {'C', 1}, {'D', 1}, {'F', 1}, {'G', 1}, {'H', 1}, {'I', 1}, {'J', 1}, {'K', 1}, {'L', 1}, {'M', 1}, {'N', 1}, {'O', 1}, {'P', 1}, {'Q', 1}, {'R', 1}, {'S', 1}, {'T', 1}, {'U', 1}, {'V', 1}, {'W', 1}, {'X', 1}, {'Y', 1}, {'Z', 1}, {'_', 2}, {'0', 17}, {'1', 17}, {'2', 17}, {'3', 17}, {'4', 17}, {'5', 17}, {'6', 17}, {'7', 17}, {'8', 17}, {'9', 17}, {'{', 4}, {'}', 4}, {'[', 4}, {']', 4}, {'(', 4}, {')', 4}, {':', 5}, {'=', 7}, {'!', 7}, {'>', 14}, {'<', 12}, {'&', 10}, {'|', 11}, {'+', 16}, {'-', 15}, {'%', 6}, {'*', 6}, {'/', 24}, {'.', 20}, {' ', 0}}},
+    {1, {{'e', 1}, {'E', 1}, {'a', 1}, {'b', 1}, {'c', 1}, {'d', 1}, {'f', 1}, {'g', 1}, {'h', 1}, {'i', 1}, {'j', 1}, {'k', 1}, {'l', 1}, {'m', 1}, {'n', 1}, {'o', 1}, {'p', 1}, {'q', 1}, {'r', 1}, {'s', 1}, {'t', 1}, {'u', 1}, {'v', 1}, {'w', 1}, {'x', 1}, {'y', 1}, {'z', 1}, {'A', 1}, {'B', 1}, {'C', 1}, {'D', 1}, {'F', 1}, {'G', 1}, {'H', 1}, {'I', 1}, {'J', 1}, {'K', 1}, {'L', 1}, {'M', 1}, {'N', 1}, {'O', 1}, {'P', 1}, {'Q', 1}, {'R', 1}, {'S', 1}, {'T', 1}, {'U', 1}, {'V', 1}, {'W', 1}, {'X', 1}, {'Y', 1}, {'Z', 1}, {'_', 2}, {'0', 2}, {'1', 2}, {'2', 2}, {'3', 2}, {'4', 2}, {'5', 2}, {'6', 2}, {'7', 2}, {'8', 2}, {'9', 2}, {'{', 3}, {'}', 3}, {'[', 3}, {']', 3}, {'(', 3}, {')', 3}, {':', 3}, {'=', 3}, {'!', 3}, {'>', 3}, {'<', 3}, {'&', 3}, {'|', 3}, {'+', 3}, {'-', 3}, {'%', 3}, {'*', 3}, {'/', 3}, {'.', 3}, {' ', 3}}},
+    {2, {{'e', 2}, {'E', 2}, {'a', 2}, {'b', 2}, {'c', 2}, {'d', 2}, {'f', 2}, {'g', 2}, {'h', 2}, {'i', 2}, {'j', 2}, {'k', 2}, {'l', 2}, {'m', 2}, {'n', 2}, {'o', 2}, {'p', 2}, {'q', 2}, {'r', 2}, {'s', 2}, {'t', 2}, {'u', 2}, {'v', 2}, {'w', 2}, {'x', 2}, {'y', 2}, {'z', 2}, {'A', 2}, {'B', 2}, {'C', 2}, {'D', 2}, {'F', 2}, {'G', 2}, {'H', 2}, {'I', 2}, {'J', 2}, {'K', 2}, {'L', 2}, {'M', 2}, {'N', 2}, {'O', 2}, {'P', 2}, {'Q', 2}, {'R', 2}, {'S', 2}, {'T', 2}, {'U', 2}, {'V', 2}, {'W', 2}, {'X', 2}, {'Y', 2}, {'Z', 2}, {'_', 2}, {'0', 2}, {'1', 2}, {'2', 2}, {'3', 2}, {'4', 2}, {'5', 2}, {'6', 2}, {'7', 2}, {'8', 2}, {'9', 2}, {'{', 3}, {'}', 3}, {'[', 3}, {']', 3}, {'(', 3}, {')', 3}, {':', 3}, {'=', 3}, {'!', 3}, {'>', 3}, {'<', 3}, {'&', 3}, {'|', 3}, {'+', 3}, {'-', 3}, {'%', 3}, {'*', 3}, {'/', 3}, {'.', 3}, {' ', 3}}},
+    {5, {{':', 4}, {'=', 6}}},
+    {7, {{'=', 6}}},
+    {10, {{'&', 6}}},
+    {11, {{'|', 6}}},
+    {12, {{'e', 13}, {'E', 13}, {'a', 13}, {'b', 13}, {'c', 13}, {'d', 13}, {'f', 13}, {'g', 13}, {'h', 13}, {'i', 13}, {'j', 13}, {'k', 13}, {'l', 13}, {'m', 13}, {'n', 13}, {'o', 13}, {'p', 13}, {'q', 13}, {'r', 13}, {'s', 13}, {'t', 13}, {'u', 13}, {'v', 13}, {'w', 13}, {'x', 13}, {'y', 13}, {'z', 13}, {'A', 13}, {'B', 13}, {'C', 13}, {'D', 13}, {'F', 13}, {'G', 13}, {'H', 13}, {'I', 13}, {'J', 13}, {'K', 13}, {'L', 13}, {'M', 13}, {'N', 13}, {'O', 13}, {'P', 13}, {'Q', 13}, {'R', 13}, {'S', 13}, {'T', 13}, {'U', 13}, {'V', 13}, {'W', 13}, {'X', 13}, {'Y', 13}, {'Z', 13}, {'_', 13}, {'0', 13}, {'1', 13}, {'2', 13}, {'3', 13}, {'4', 13}, {'5', 13}, {'6', 13}, {'7', 13}, {'8', 13}, {'9', 13}, {'{', 13}, {'}', 13}, {'[', 13}, {']', 13}, {'(', 13}, {')', 13}, {':', 13}, {'=', 6}, {'!', 13}, {'>', 6}, {'<', 6}, {'&', 13}, {'|', 13}, {'+', 13}, {'-', 13}, {'%', 13}, {'*', 13}, {'/', 13}, {'.', 13}, {' ', 13}}},
+    {14, {{'e', 13}, {'E', 13}, {'a', 13}, {'b', 13}, {'c', 13}, {'d', 13}, {'f', 13}, {'g', 13}, {'h', 13}, {'i', 13}, {'j', 13}, {'k', 13}, {'l', 13}, {'m', 13}, {'n', 13}, {'o', 13}, {'p', 13}, {'q', 13}, {'r', 13}, {'s', 13}, {'t', 13}, {'u', 13}, {'v', 13}, {'w', 13}, {'x', 13}, {'y', 13}, {'z', 13}, {'A', 13}, {'B', 13}, {'C', 13}, {'D', 13}, {'F', 13}, {'G', 13}, {'H', 13}, {'I', 13}, {'J', 13}, {'K', 13}, {'L', 13}, {'M', 13}, {'N', 13}, {'O', 13}, {'P', 13}, {'Q', 13}, {'R', 13}, {'S', 13}, {'T', 13}, {'U', 13}, {'V', 13}, {'W', 13}, {'X', 13}, {'Y', 13}, {'Z', 13}, {'_', 13}, {'0', 13}, {'1', 13}, {'2', 13}, {'3', 13}, {'4', 13}, {'5', 13}, {'6', 13}, {'7', 13}, {'8', 13}, {'9', 13}, {'{', 13}, {'}', 13}, {'[', 13}, {']', 13}, {'(', 13}, {')', 13}, {':', 13}, {'=', 6}, {'!', 13}, {'>', 6}, {'<', 13}, {'&', 13}, {'|', 13}, {'+', 13}, {'-', 13}, {'%', 13}, {'*', 13}, {'/', 13}, {'.', 13}, {' ', 13}}},
+    {15, {{'e', 13}, {'E', 13}, {'a', 13}, {'b', 13}, {'c', 13}, {'d', 13}, {'f', 13}, {'g', 13}, {'h', 13}, {'i', 13}, {'j', 13}, {'k', 13}, {'l', 13}, {'m', 13}, {'n', 13}, {'o', 13}, {'p', 13}, {'q', 13}, {'r', 13}, {'s', 13}, {'t', 13}, {'u', 13}, {'v', 13}, {'w', 13}, {'x', 13}, {'y', 13}, {'z', 13}, {'A', 13}, {'B', 13}, {'C', 13}, {'D', 13}, {'F', 13}, {'G', 13}, {'H', 13}, {'I', 13}, {'J', 13}, {'K', 13}, {'L', 13}, {'M', 13}, {'N', 13}, {'O', 13}, {'P', 13}, {'Q', 13}, {'R', 13}, {'S', 13}, {'T', 13}, {'U', 13}, {'V', 13}, {'W', 13}, {'X', 13}, {'Y', 13}, {'Z', 13}, {'_', 13}, {'0', 17}, {'1', 17}, {'2', 17}, {'3', 17}, {'4', 17}, {'5', 17}, {'6', 17}, {'7', 17}, {'8', 17}, {'9', 17}, {'{', 13}, {'}', 13}, {'[', 13}, {']', 13}, {'(', 13}, {')', 13}, {':', 13}, {'=', 13}, {'!', 13}, {'>', 13}, {'<', 13}, {'&', 13}, {'|', 13}, {'+', 13}, {'-', 13}, {'%', 13}, {'*', 13}, {'/', 13}, {'.', 20}, {' ', 13}}},
+    {16, {{'e', 13}, {'E', 13}, {'a', 13}, {'b', 13}, {'c', 13}, {'d', 13}, {'f', 13}, {'g', 13}, {'h', 13}, {'i', 13}, {'j', 13}, {'k', 13}, {'l', 13}, {'m', 13}, {'n', 13}, {'o', 13}, {'p', 13}, {'q', 13}, {'r', 13}, {'s', 13}, {'t', 13}, {'u', 13}, {'v', 13}, {'w', 13}, {'x', 13}, {'y', 13}, {'z', 13}, {'A', 13}, {'B', 13}, {'C', 13}, {'D', 13}, {'F', 13}, {'G', 13}, {'H', 13}, {'I', 13}, {'J', 13}, {'K', 13}, {'L', 13}, {'M', 13}, {'N', 13}, {'O', 13}, {'P', 13}, {'Q', 13}, {'R', 13}, {'S', 13}, {'T', 13}, {'U', 13}, {'V', 13}, {'W', 13}, {'X', 13}, {'Y', 13}, {'Z', 13}, {'_', 13}, {'0', 17}, {'1', 17}, {'2', 17}, {'3', 17}, {'4', 17}, {'5', 17}, {'6', 17}, {'7', 17}, {'8', 17}, {'9', 17}, {'{', 13}, {'}', 13}, {'[', 13}, {']', 13}, {'(', 13}, {')', 13}, {':', 13}, {'=', 6}, {'!', 13}, {'>', 13}, {'<', 13}, {'&', 13}, {'|', 13}, {'+', 6}, {'-', 13}, {'%', 13}, {'*', 13}, {'/', 13}, {'.', 20}, {' ', 13}}},
+    {17, {{'e', 21}, {'E', 21}, {'a', 19}, {'b', 19}, {'c', 19}, {'d', 19}, {'f', 19}, {'g', 19}, {'h', 19}, {'i', 19}, {'j', 19}, {'k', 19}, {'l', 19}, {'m', 19}, {'n', 19}, {'o', 19}, {'p', 19}, {'q', 19}, {'r', 19}, {'s', 19}, {'t', 19}, {'u', 19}, {'v', 19}, {'w', 19}, {'x', 19}, {'y', 19}, {'z', 19}, {'A', 19}, {'B', 19}, {'C', 19}, {'D', 19}, {'F', 19}, {'G', 19}, {'H', 19}, {'I', 19}, {'J', 19}, {'K', 19}, {'L', 19}, {'M', 19}, {'N', 19}, {'O', 19}, {'P', 19}, {'Q', 19}, {'R', 19}, {'S', 19}, {'T', 19}, {'U', 19}, {'V', 19}, {'W', 19}, {'X', 19}, {'Y', 19}, {'Z', 19}, {'_', 19}, {'0', 17}, {'1', 17}, {'2', 17}, {'3', 17}, {'4', 17}, {'5', 17}, {'6', 17}, {'7', 17}, {'8', 17}, {'9', 17}, {'{', 19}, {'}', 19}, {'[', 19}, {']', 19}, {'(', 19}, {')', 19}, {':', 19}, {'=', 19}, {'!', 19}, {'>', 19}, {'<', 19}, {'&', 19}, {'|', 19}, {'+', 19}, {'-', 19}, {'%', 19}, {'*', 19}, {'/', 19}, {'.', 18}, {' ', 19}}},
+    {18, {{'e', 21}, {'E', 21}, {'a', 19}, {'b', 19}, {'c', 19}, {'d', 19}, {'f', 19}, {'g', 19}, {'h', 19}, {'i', 19}, {'j', 19}, {'k', 19}, {'l', 19}, {'m', 19}, {'n', 19}, {'o', 19}, {'p', 19}, {'q', 19}, {'r', 19}, {'s', 19}, {'t', 19}, {'u', 19}, {'v', 19}, {'w', 19}, {'x', 19}, {'y', 19}, {'z', 19}, {'A', 19}, {'B', 19}, {'C', 19}, {'D', 19}, {'F', 19}, {'G', 19}, {'H', 19}, {'I', 19}, {'J', 19}, {'K', 19}, {'L', 19}, {'M', 19}, {'N', 19}, {'O', 19}, {'P', 19}, {'Q', 19}, {'R', 19}, {'S', 19}, {'T', 19}, {'U', 19}, {'V', 19}, {'W', 19}, {'X', 19}, {'Y', 19}, {'Z', 19}, {'_', 19}, {'0', 18}, {'1', 18}, {'2', 18}, {'3', 18}, {'4', 18}, {'5', 18}, {'6', 18}, {'7', 18}, {'8', 18}, {'9', 18}, {'{', 19}, {'}', 19}, {'[', 19}, {']', 19}, {'(', 19}, {')', 19}, {':', 19}, {'=', 19}, {'!', 19}, {'>', 19}, {'<', 19}, {'&', 19}, {'|', 19}, {'+', 19}, {'-', 19}, {'%', 19}, {'*', 19}, {'/', 19}, {'.', 19}, {' ', 19}}},
+    {20, {{'0', 18}, {'1', 18}, {'2', 18}, {'3', 18}, {'4', 18}, {'5', 18}, {'6', 18}, {'7', 18}, {'8', 18}, {'9', 18}}},
+    {21, {{'0', 22}, {'1', 22}, {'2', 22}, {'3', 22}, {'4', 22}, {'5', 22}, {'6', 22}, {'7', 22}, {'8', 22}, {'9', 22}}},
+    {22, {{'e', 19}, {'E', 19}, {'a', 19}, {'b', 19}, {'c', 19}, {'d', 19}, {'f', 19}, {'g', 19}, {'h', 19}, {'i', 19}, {'j', 19}, {'k', 19}, {'l', 19}, {'m', 19}, {'n', 19}, {'o', 19}, {'p', 19}, {'q', 19}, {'r', 19}, {'s', 19}, {'t', 19}, {'u', 19}, {'v', 19}, {'w', 19}, {'x', 19}, {'y', 19}, {'z', 19}, {'A', 19}, {'B', 19}, {'C', 19}, {'D', 19}, {'F', 19}, {'G', 19}, {'H', 19}, {'I', 19}, {'J', 19}, {'K', 19}, {'L', 19}, {'M', 19}, {'N', 19}, {'O', 19}, {'P', 19}, {'Q', 19}, {'R', 19}, {'S', 19}, {'T', 19}, {'U', 19}, {'V', 19}, {'W', 19}, {'X', 19}, {'Y', 19}, {'Z', 19}, {'_', 19}, {'0', 22}, {'1', 22}, {'2', 22}, {'3', 22}, {'4', 22}, {'5', 22}, {'6', 22}, {'7', 22}, {'8', 22}, {'9', 22}, {'{', 19}, {'}', 19}, {'[', 19}, {']', 19}, {'(', 19}, {')', 19}, {':', 19}, {'=', 19}, {'!', 19}, {'>', 19}, {'<', 19}, {'&', 19}, {'|', 19}, {'+', 23}, {'-', 23}, {'%', 19}, {'*', 19}, {'/', 19}, {'.', 19}}},
+    {23, {{'0', 22}, {'1', 22}, {'2', 22}, {'3', 22}, {'4', 22}, {'5', 22}, {'6', 22}, {'7', 22}, {'8', 22}, {'9', 22}}},
+    {24, {{'e', 13}, {'E', 13}, {'a', 13}, {'b', 13}, {'c', 13}, {'d', 13}, {'f', 13}, {'g', 13}, {'h', 13}, {'i', 13}, {'j', 13}, {'k', 13}, {'l', 13}, {'m', 13}, {'n', 13}, {'o', 13}, {'p', 13}, {'q', 13}, {'r', 13}, {'s', 13}, {'t', 13}, {'u', 13}, {'v', 13}, {'w', 13}, {'x', 13}, {'y', 13}, {'z', 13}, {'A', 13}, {'B', 13}, {'C', 13}, {'D', 13}, {'F', 13}, {'G', 13}, {'H', 13}, {'I', 13}, {'J', 13}, {'K', 13}, {'L', 13}, {'M', 13}, {'N', 13}, {'O', 13}, {'P', 13}, {'Q', 13}, {'R', 13}, {'S', 13}, {'T', 13}, {'U', 13}, {'V', 13}, {'W', 13}, {'X', 13}, {'Y', 13}, {'Z', 13}, {'_', 13}, {'0', 13}, {'1', 13}, {'2', 13}, {'3', 13}, {'4', 13}, {'5', 13}, {'6', 13}, {'7', 13}, {'8', 13}, {'9', 13}, {'{', 13}, {'}', 13}, {'[', 13}, {']', 13}, {'(', 13}, {')', 13}, {':', 13}, {'=', 13}, {'!', 13}, {'>', 13}, {'<', 13}, {'&', 13}, {'|', 13}, {'+', 13}, {'-', 13}, {'%', 13}, {'.', 13}}},
+    };
+    struct final_state_information {
+        bool advance = false;
+        string class_type = "Meow";
+    };
+    std::unordered_map<int, final_state_information> final_states = {
+        {3,{false,"id"}},
+        {4,{true,"pun"}},
+        {6,{true,"op"}},
+        {13,{false,"op"}},
+        {19,{false,"num"}}
+    };
+    std::unordered_map<string,int> symbol_table{};
+
+
     int lexeme_begin{};
     int lexeme_end{};
     ifstream input_file{};
-    ofstream symbol_table{};
-    static const int BUFFER_SIZE = 40;
-    meow_queue<char,BUFFER_SIZE> input_buffer;
-    unordered_map<int, std::unordered_map<char, int>> transition_table;
-
-public:
+    ofstream symbol_table_file{};
+    static const int BUFFER_SIZE = 25;
+    meow_queue<char,BUFFER_SIZE*2> input_buffer;
+    int current_index{};
+    ostringstream lexeme{};
+    int id_index{1};
+    int literal_index{1};
+    
+    
+protected:
     char getNextCharacter()
     {
         if (input_buffer.empty()) return '\0'; //eof
@@ -81,8 +120,13 @@ public:
     }
     void moveToNextCharacter()
     {
-        if(!input_buffer.empty())
+        if (!input_buffer.empty())
+        {
             input_buffer.pop();
+            current_index++;
+            if (current_index >= BUFFER_SIZE) fill_input_buffer();
+        }
+
     }
     void fill_input_buffer()
     {
@@ -93,29 +137,106 @@ public:
                 input_buffer.push(ch);
         }
     }
-    
     void close_files()
     {
         if (input_file) input_file.close();
-        if (symbol_table) symbol_table.close();
+        if (symbol_table_file) symbol_table_file.close();
     }
 
-    LexicalAnalyzer(string input_file_name, string symbol_table_file_name = "symbol_table.txt") :lexeme_begin(0), lexeme_end(0), input_file(input_file_name), symbol_table(symbol_table_file_name),input_buffer{}
+    void analyzer()
     {
+        bool flag = true;
+        int state = 0;
+        while (flag)
+        {
+            flag = !input_buffer.empty();
+            char ch = getNextCharacter();
+            ///////////////////////////////////////////////////cout << state << "-->";
+            if(transition_table.find(state) != transition_table.end() && transition_table[state].find(ch) != transition_table[state].end())
+            {
+                state = transition_table[state][ch];
+            }
+            else
+            {
+                //TODO write error to file
+                
+                cout << "<Error,"+lexeme.str() + ">";
+                // Clear ostringstream for reuse
+                lexeme.str("");   // Reset the string content
+                lexeme.clear();   // Clear any error flags
+                lexeme.seekp(0);  // Reset the write position (optional)
+                state = 0; //error
+                continue;
+            }
+
+            //if(! (final_states.find(state) != final_states.end() && !final_states[state].advance))
+            //if(final_states.find(state) == final_states.end() || final_states[state].advance)
+
+
+            if (final_states.find(state) != final_states.end())
+            {
+                final_state_information final_state = final_states[state];
+                if (final_state.advance)
+                {
+                    moveToNextCharacter();
+                    lexeme.put(ch);
+                }             
+                string complete_lexeme = lexeme.str();
+                if (final_state.class_type == "id")
+                {
+                    ///////////////////////////////////////////////////////////////////////////////////////cout << "---" << state << "---\n";
+                    if (symbol_table.find(complete_lexeme) == symbol_table.end())
+                    {
+                        complete_lexeme = to_string(id_index);
+                        symbol_table[complete_lexeme] = id_index++;
+                    }
+                    else
+                    {
+                        complete_lexeme = to_string(symbol_table[complete_lexeme]);
+                    }
+                }
+                else if (final_state.class_type == "literal")
+                {
+
+                }
+                string token = "<" + final_state.class_type + "," + complete_lexeme + ">";
+                cout << token << " ";
+                
+
+                //write token in file
+                state = 0;
+                // Clear ostringstream for reuse
+                lexeme.str("");   // Reset the string content
+                lexeme.clear();   // Clear any error flags
+                lexeme.seekp(0);  // Reset the write position (optional)
+            }  
+            else
+            {
+                moveToNextCharacter();
+                lexeme.put(ch);
+            }
+
+        }
+        cout << state;
+
+    }
+
+public:
+    LexicalAnalyzer(string input_file_name = "input.txt", string symbol_table_file_name = "symbol_table.txt") :lexeme_begin(0), lexeme_end(0), input_file(input_file_name), symbol_table_file(symbol_table_file_name), input_buffer{},current_index(0), lexeme(),id_index(1),literal_index(1)
+    {
+        
         if (!input_file) {
             cerr << "Input File not found!\n Check if the file is within the project.\n";
             close_files();
             exit(1);
         }
-        if (!symbol_table) {
+        if (!symbol_table_file) {
             cerr << "Access Denied!\n Symbol Table's file is not created.\n";
             close_files();
             exit(1);
         }
-
-
-
-
+        fill_input_buffer();
+        analyzer();
     }
     ~LexicalAnalyzer()
     {
@@ -124,81 +245,11 @@ public:
 };
 
 int main() {
-   
-   /*
-    // Step 1: Open input file in read mode
-    ifstream inputFile("input.txt");
-    if (!inputFile) {
-        cerr << "Error opening input file!" << endl;
-        return 1; // Exit with error code
-    }
-
-    // Step 2: Open output file in write mode
-    ofstream outputFile("output.txt");
-    if (!outputFile) {
-        cerr << "Error creating output file!" << endl;
-        return 1;
-    }
-
-    // Step 3: Read character by character
-    string tempString = "";
-    char ch;
-
-    while (inputFile.get(ch)) { // Reads one character at a time
-        cout << ch;
-        if (ch == '\n') { // When a newline is encountered, write to file
-            outputFile << tempString << endl; // Write string to output file
-            tempString = ""; // Reset for next line
-        }
-        else {
-            tempString += ch; // Append character to current string
-        }
-    }
-
-    // Step 4: Write any remaining data to output file
-    if (!tempString.empty()) {
-        outputFile << tempString << endl;
-    }
-
-    // Step 5: Close files
-    inputFile.close();
-    outputFile.close();
-
-    cout << "File processing completed successfully." << endl; */
-
-    /*LexicalAnalyzer analyzer("input.txt");
-
-    char ch;
-    while ((ch = analyzer.test()) != '\0') {
-        cout << ch;
-    }
-    cout << endl;*/
-
-
-    std::unordered_map<int, std::unordered_map<char, int>> mainMap;
-
-    // Initializing values
-    mainMap[0] = { {'a', 10}, {'b', 20}, {'c', 30} };
-    mainMap[2] = { {'x', 100}, {'y', 200}, {'z', 300} };
-    mainMap[3] = { {'m', 500}, {'n', 600} };
-
-    // Accessing elements
-    std::cout << "Value at mainMap[1]['a']: " << mainMap[1]['a'] << std::endl;
-    std::cout << "Value at mainMap[2]['y']: " << mainMap[2]['y'] << std::endl;
-
-    // Iterating through the nested hash map
-    for (const auto& outerPair : mainMap) {
-        int outerKey = outerPair.first;
-        std::cout << "Key: " << outerKey << " -> { ";
-
-        for (const auto& innerPair : outerPair.second) {
-            char innerKey = innerPair.first;
-            int innerValue = innerPair.second;
-            std::cout << "'" << innerKey << "': " << innerValue << ", ";
-        }
-        std::cout << "}" << std::endl;
-    }
-
-
+    
+    cout << "Analyzing Source Code...\n";
+    LexicalAnalyzer sad("input.txt");
+    
+    system("pause");
     return 0;
 }
+
