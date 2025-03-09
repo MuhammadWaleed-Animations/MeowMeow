@@ -130,10 +130,15 @@
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="errors.txt" />
     <Text Include="input.txt" />
+    <Text Include="literal_table.txt" />
+    <Text Include="symbol_table.txt" />
+    <Text Include="tokens.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MeowMeow_Transitions.csv" />
+    <None Include="table.py" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

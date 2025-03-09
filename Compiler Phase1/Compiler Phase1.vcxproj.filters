@@ -23,9 +23,24 @@
     <Text Include="input.txt">
       <Filter>Source Files</Filter>
     </Text>
+    <Text Include="symbol_table.txt">
+      <Filter>Source Files</Filter>
+    </Text>
+    <Text Include="errors.txt">
+      <Filter>Source Files</Filter>
+    </Text>
+    <Text Include="tokens.txt">
+      <Filter>Source Files</Filter>
+    </Text>
+    <Text Include="literal_table.txt">
+      <Filter>Source Files</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <None Include="MeowMeow_Transitions.csv">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="table.py">
       <Filter>Source Files</Filter>
     </None>
   </ItemGroup>

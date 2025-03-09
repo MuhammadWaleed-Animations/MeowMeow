@@ -1,0 +1,8 @@
+_num 1
+abc_ 7
+num_ 2
+n_umber 3
+cou_se 4
+hheehe_ 8
+course_ 5
+_flag 6

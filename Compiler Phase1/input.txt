@@ -1,1 +1,19 @@
-abc_.234{(*>abc
+Adadi Marqazi () 
+{ 
+Adadi _num = 10 :: 
+Ashriya num_ = -10.5E+12 :: 
+Ashriya n_umber = +9.3 :: 
+Harf cou_se = "c" :: 
+Matn course_ = "Compiler Construction" :: 
+Mantiqi _flag = True :: 
+Agar ( _flag ) 
+output<- "Ok" :: 
+Wagarna 
+input-> _num :: 
+Wapas 0 :: 
+}
+
+
+
+abc_.23asm.4{(*>input->*output<-345
+hheehe_
