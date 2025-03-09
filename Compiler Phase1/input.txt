@@ -1,3 +1,126 @@
+//Hello
+Marqazi int main() {
+    Adadi x := .10;
+    Ashriya y := 10.5E2;
+    Matn name := "Hello";
+    
+/*Helolll
+jdjsdjskdjksjdjs_*/ 
+    Agar (x < 100) {
+        x += 1;
+    } Wagarna
+ 
+
+{
+        Wapas x;
+    }
+    
+    for (Adadi i := 0; i < 10; ++i) {
+        output<- i;
+    }
+
+    if (x && y || z) {
+        dost func();
+    }
+
+    return 0;
+
+}
+
+
+-
+-
+-
+-
+-
+
+/* This is a multi-line comment
+   It should be ignored by the lexer */
+
+// Single-line comment should be ignored too
+
+Adadi Marqazi() 
+{ 
+    // Identifiers
+    Adadi _num1 = 10 ::    // Valid identifier (contains '_')
+    Adadi num2 = 20 ::    // Invalid identifier (no '_')
+
+    // Numbers (Integer, Floating, Exponential)
+    Ashriya _float1 = -10.5E+12 ::   // Valid floating point number
+    Ashriya _float2 = +9.3 ::        // Valid floating point
+    Ashriya _float3 = .45 ::         //  Invalid (missing leading digit)
+    Ashriya _float4 = 9. ::          //  Invalid (missing trailing digit)
+
+    // Character & String Literals
+    Harf valid_char = "c" ::    
+    Harf invalid_char = "cc" ::    //  Invalid (too many characters)
+    Matn valid_string = "Compiler Construction" ::  
+    Matn invalid_string = "Unclosed String ::   //  Invalid (missing closing quote)
+
+    // Boolean
+    Mantiqi _flag = True ::
+    Mantiqi invalid_bool = FALSE ::   //  Invalid (wrong keyword case)
+
+    // Operators
+    Agar (_num1 < 20) && (_float1 >= 9.3) 
+    {
+        output<- "Valid Condition" ::
+    }
+    Wagarna 
+    {
+        output<- "Invalid Condition" ::
+    }
+
+    // Edge Cases: Consecutive Spaces, Tabs, Newlines
+    Adadi    __weird   =   42    ::   // Lexer should handle extra spaces
+
+    // Complex Expressions
+    _num1 += (_float1 * 2) / 3 - (_float2++) ::  
+
+    // Nested Blocks & Comments in Between
+    Agar (1)
+    {
+        // Comment inside a block
+        Agar (2) {
+            Wapas 3 ::  
+        } 
+    }
+    else if (_num1 <> 10) {   // Invalid operator (<> should be !=)
+        output<- "Error" ::
+    }
+
+    // Testing All Operators
+    Adadi x = 1 + 2 - 3 * 4 / 5 % 6 ::  
+    x += 10 ::  
+    x++ ::  
+    x-- ::  
+    x := 100 ::  
+    Agar (x == 100) 
+    {
+        output<- "Assignment and Comparison Operators" ::
+    }
+
+    // Handling Comments in Expressions
+    Adadi y = 50 /* This is a hidden value */ + 10 ::
+    
+    // Testing all keywords
+    asm Wagarna new this auto enum operator throw Mantiqi explicit private
+    True break export protected try case extern public typedef catch False 
+    register typeid Harf Ashriya typename Adadi class for Wapas union const
+    dost short unsigned goto signed using continue Agar sizeof virtual default
+    inline static Khali delete volatile do long struct double mutable switch 
+    while namespace template Marqazi Matn input-> output<- ::
+
+    Wapas 0 ::
+}
+
+
++
++
++
++
++
+
 Adadi Marqazi () 
 { 
 Adadi _num = 10 :: 

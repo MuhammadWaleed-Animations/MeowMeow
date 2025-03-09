@@ -35,6 +35,9 @@
     <Text Include="literal_table.txt">
       <Filter>Source Files</Filter>
     </Text>
+    <Text Include="keywords.txt">
+      <Filter>Source Files</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <None Include="MeowMeow_Transitions.csv">
