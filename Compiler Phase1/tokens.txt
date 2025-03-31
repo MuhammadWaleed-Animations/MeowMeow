@@ -1,3 +1,7 @@
+<op,:=><num,0>
+
+
+
 
 <keyword,8><pun,(><pun,)><pun,{>
 <keyword,1><op,:=><num,.10>
@@ -49,16 +53,16 @@
 
 <keyword,3><id,2><num,-10.5E+12><pun,::>
 <keyword,3><id,3><num,+9.3><pun,::>
-<keyword,3><id,4><num,.45><pun,::>
-<keyword,3><id,5><num,9.><pun,::>
+<keyword,3><id,3><num,.45><pun,::>
+<keyword,3><id,4><num,9.><pun,::>
 
-<keyword,5><id,6><literal,2><pun,::>
-<keyword,5><id,7><literal,3><pun,::>
-<keyword,9><id,8><literal,4><pun,::>
-<keyword,9><id,9>
+<keyword,5><id,5><literal,2><pun,::>
+<keyword,5><id,6><literal,3><pun,::>
+<keyword,9><id,7><literal,4><pun,::>
+<keyword,9><id,8>
 
-<keyword,7><id,10><keyword,10><pun,::>
-<keyword,7><id,11><pun,::>
+<keyword,7><id,9><keyword,10><pun,::>
+<keyword,7><id,10><pun,::>
 
 <keyword,2><pun,(><id,1><op,<><num,20><pun,)><op,&&><pun,(><id,2><op,>=><num,9.3><pun,)>
 <pun,{>
@@ -70,7 +74,7 @@
 <pun,}>
 
 
-<keyword,1><id,12><num,42><pun,::>
+<keyword,1><id,11><num,42><pun,::>
 
 <id,1><op,+=><pun,(><id,2><op,*><num,2><pun,)><op,/><num,3><op,-><pun,(><id,3><op,++><pun,)><pun,::>
 
@@ -128,21 +132,21 @@
 
 <keyword,1><keyword,8><pun,(><pun,)>
 <pun,{>
-<keyword,1><id,13><num,10><pun,::>
-<keyword,3><id,14><num,-10.5E+12><pun,::>
-<keyword,3><id,15><num,+9.3><pun,::>
-<keyword,5><id,16><literal,2><pun,::>
-<keyword,9><id,17><literal,4><pun,::>
-<keyword,7><id,10><keyword,10><pun,::>
-<keyword,2><pun,(><id,10><pun,)>
+<keyword,1><id,12><num,10><pun,::>
+<keyword,3><id,13><num,-10.5E+12><pun,::>
+<keyword,3><id,14><num,+9.3><pun,::>
+<keyword,5><id,15><literal,2><pun,::>
+<keyword,9><id,16><literal,4><pun,::>
+<keyword,7><id,9><keyword,10><pun,::>
+<keyword,2><pun,(><id,9><pun,)>
 <keyword,39><literal,9><pun,::>
 <keyword,11>
-<keyword,33><id,13><pun,::>
+<keyword,33><id,12><pun,::>
 <keyword,12><num,0><pun,::>
 <pun,}>
 
 
 
-<id,18><num,.23><keyword,13><num,.4><pun,{><pun,(><op,*><op,>><keyword,33><op,*><keyword,39>
+<id,17><num,.23><keyword,13><num,.4><pun,{><pun,(><op,*><op,>><keyword,33><op,*><keyword,39>
 <num,345>
-<id,19>
+<id,18>

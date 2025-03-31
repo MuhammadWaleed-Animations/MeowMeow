@@ -1,3 +1,7 @@
+:=0;
+: = 
+
+
 //Hello
 Marqazi int main() {
     Adadi x := .10;
@@ -48,7 +52,7 @@ Adadi Marqazi()
     // Numbers (Integer, Floating, Exponential)
     Ashriya _float1 = -10.5E+12 ::   // Valid floating point number
     Ashriya _float2 = +9.3 ::        // Valid floating point
-    Ashriya _float3 = .45 ::         //  Invalid (missing leading digit)
+    Ashriya _float2 = .45 ::         //  Invalid (missing leading digit)
     Ashriya _float4 = 9. ::          //  Invalid (missing trailing digit)
 
     // Character & String Literals

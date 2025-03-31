@@ -8,65 +8,68 @@ using namespace std;
 class LexicalAnalyzer {
 private:
     //Data Structures
-    template<typename T,int SIZE>
+    template<typename T, int SIZE>
     class meow_queue {
-    private:
-        int start;
-        int end;
-        int size;
-        T buffer[SIZE];
-    public:
-        meow_queue() :start(0), end(0), size(SIZE), buffer{} {};
-        bool empty()
-        {
-            return (size == SIZE);
-        }
-        bool full()
-        {
-            return !size;
-        }
-        void push(T element)
-        {
-            if(full()) throw std::out_of_range("Queue is full");
-            else
-            {
-                end %= SIZE;
-                buffer[end] = element;
-                end++;
+        private:
+            static const int HALF_SIZE = SIZE / 2;
+            int start, end, size;
+            T buffer1[HALF_SIZE]{};
+            T buffer2[HALF_SIZE]{};
+
+        public:
+            meow_queue() : start(0), end(0), size(SIZE) {}
+
+            bool empty() {
+                return size == SIZE;
+            }
+
+            bool full() {
+                return size == 0;
+            }
+
+            void push(T element) {
+                if (full()) throw std::out_of_range("Queue is full");
+
+                if (end < HALF_SIZE) {
+                    buffer1[end] = element;
+                }
+                else {
+                    buffer2[end - HALF_SIZE] = element;
+                }
+
+                end = (end + 1) % SIZE;
                 size--;
             }
-        }
-        void pop()
-        {
-            if (empty()) throw std::out_of_range("Queue is Empty");
-            else
-            {
-                start++;
-                start %= SIZE;
+
+            void pop() {
+                if (empty()) throw std::out_of_range("Queue is Empty");
+
+                start = (start + 1) % SIZE;
                 size++;
             }
-        }
-        T front()
-        {
-            if (empty()) throw std::out_of_range("Queue is Empty");
-            start %= SIZE;
-            return buffer[start];
-        }
-        T peek_next_front()
-        {
-            if (get_size() < 2) throw std::out_of_range("Queue is of size < 2");;
-            return buffer[(start+1)%SIZE];
-        }
-        T back()
-        {
-            if (empty()) throw std::out_of_range("Queue is Empty");
-            end %= SIZE;
-            return buffer[end];
-        }
-        int get_size()
-        {
-            return (SIZE-size);
-        }
+
+            T front() {
+                if (empty()) throw std::out_of_range("Queue is Empty");
+
+                return (start < HALF_SIZE) ? buffer1[start] : buffer2[start - HALF_SIZE];
+            }
+
+            T peek_next_front() {
+                if (get_size() < 2) throw std::out_of_range("Queue is of size < 2");
+                int next_start = (start + 1) % SIZE;
+                return (next_start < HALF_SIZE) ? buffer1[next_start] : buffer2[next_start - HALF_SIZE];
+            }
+
+            T back() {
+                if (empty()) throw std::out_of_range("Queue is Empty");
+
+                int last_index = (end == 0) ? SIZE - 1 : end - 1;
+                return (last_index < HALF_SIZE) ? buffer1[last_index] : buffer2[last_index - HALF_SIZE];
+            }
+
+            int get_size() {
+                return SIZE - size;
+            }
     };
     struct final_state_information {
         bool advance = false;
@@ -172,20 +175,16 @@ private:
     int id_index{ 1 };
     int literal_index{ 1 };
 
-
     //Files
     ifstream input_file{};
     ofstream symbol_table_file{};
     ofstream tokens_file{};
     ofstream errors_file{};
     ofstream literal_table_file{};
-    
 
     //Input Buffer
     static const int BUFFER_SIZE = 25;
     meow_queue<char,BUFFER_SIZE*2> input_buffer;
-
-
     int lexeme_begin{};
     int lexeme_end{};    
 
@@ -249,6 +248,7 @@ protected:
             {
                 cout << "\n";
                 tokens_file << "\n";
+                errors_file << "\n";
             }
             moveToNextCharacter();
             ch = getNextCharacter();
@@ -299,6 +299,7 @@ protected:
 
             cout << "\n";
             tokens_file << "\n";
+            errors_file << "\n";
         }
         else
             cout << "<This wasn't suppose to happen>";
@@ -306,7 +307,6 @@ protected:
         moveToNextCharacter();
         ch = getNextCharacter();
     }
-
     void finalStateHandler(int& state,char& ch)
     {
         final_state_information final_state = final_states[state];
@@ -353,6 +353,7 @@ protected:
             {
                 cout << "\n";
                 tokens_file << "\n";
+                errors_file << "\n";
             }
             if (state == 0)
             {
@@ -442,8 +443,6 @@ protected:
         }
         //cout << state;
     }
-
-
     void writeTables()
     {
         for (auto entry : symbol_table)
@@ -513,6 +512,5 @@ int main() {
     LexicalAnalyzer* sad = new LexicalAnalyzer("input.txt");
     delete sad;
     
-    system("pause");
     return 0;
 }
