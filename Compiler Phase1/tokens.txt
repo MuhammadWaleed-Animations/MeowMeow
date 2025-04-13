@@ -3,7 +3,7 @@
 
 
 
-<keyword,8><pun,(><pun,)><pun,{>
+<keyword,8><pun,(><pun,,><pun,,><pun,)><pun,{>
 <keyword,1><op,:=><num,.10>
 <keyword,3><op,:=><num,10.5E2>
 <keyword,9><op,:=><literal,1>

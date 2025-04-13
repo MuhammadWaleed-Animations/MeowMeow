@@ -3,7 +3,7 @@
 
 
 //Hello
-Marqazi int main() {
+Marqazi int main(,,) {
     Adadi x := .10;
     Ashriya y := 10.5E2;
     Matn name := "Hello";
