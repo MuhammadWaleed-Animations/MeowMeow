@@ -88,10 +88,19 @@ def read_file_to_hashmap(filename):
 
 def print_cpp_kmap(hashmap):
     """Prints the hashmap in C++ unordered_map<int, std::string> format."""
-    print("std::unordereds_table<std::string,int> keyword_map = {")
+    print("std::unordered_map<std::string,int> keyword_map = {")
     
     for key, value in hashmap.items():
         print(f'    {{"{value}", {key}}},')
+    
+    print("};")
+
+
+
+    print("std::unordered_map<std::string,std::string> rkeyword_map = {")
+    
+    for key, value in hashmap.items():
+        print(f'    {{"{key}", "{value}"}},')
     
     print("};")
 

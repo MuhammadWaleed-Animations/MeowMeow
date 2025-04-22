@@ -2,10 +2,141 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <cctype>
 #include <unordered_map>
 #include <vector>
 using namespace std;
 
+std::unordered_map<std::string, int> keywords_table = {
+    {"Adadi", 1},
+    {"Agar", 2},
+    {"Ashriya", 3},
+    {"False", 4},
+    {"Harf", 5},
+    {"Khali", 6},
+    {"Mantiqi", 7},
+    {"Marqazi", 8},
+    {"Matn", 9},
+    {"True", 10},
+    {"Wagarna", 11},
+    {"Wapas", 12},
+    {"asm", 13},
+    {"auto", 14},
+    {"break", 15},
+    {"case", 16},
+    {"catch", 17},
+    {"class", 18},
+    {"const", 19},
+    {"continue", 20},
+    {"default", 21},
+    {"delete", 22},
+    {"do", 23},
+    {"dost", 24},
+    {"double", 25},
+    {"enum", 26},
+    {"explicit", 27},
+    {"export", 28},
+    {"extern", 29},
+    {"for", 30},
+    {"goto", 31},
+    {"inline", 32},
+    {"input->", 33},
+    {"long", 34},
+    {"mutable", 35},
+    {"namespace", 36},
+    {"new", 37},
+    {"operator", 38},
+    {"output<-", 39},
+    {"private", 40},
+    {"protected", 41},
+    {"public", 42},
+    {"register", 43},
+    {"short", 44},
+    {"signed", 45},
+    {"sizeof", 46},
+    {"static", 47},
+    {"struct", 48},
+    {"switch", 49},
+    {"template", 50},
+    {"this", 51},
+    {"throw", 52},
+    {"try", 53},
+    {"typedef", 54},
+    {"typeid", 55},
+    {"typename", 56},
+    {"union", 57},
+    {"unsigned", 58},
+    {"using", 59},
+    {"virtual", 60},
+    {"volatile", 61},
+    {"while", 62},
+};
+std::unordered_map<std::string, std::string> rkeywords_map = {
+    {"1", "Adadi"},
+    {"2", "Agar"},
+    {"3", "Ashriya"},
+    {"4", "False"},
+    {"5", "Harf"},
+    {"6", "Khali"},
+    {"7", "Mantiqi"},
+    {"8", "Marqazi"},
+    {"9", "Matn"},
+    {"10", "True"},
+    {"11", "Wagarna"},
+    {"12", "Wapas"},
+    {"13", "asm"},
+    {"14", "auto"},
+    {"15", "break"},
+    {"16", "case"},
+    {"17", "catch"},
+    {"18", "class"},
+    {"19", "const"},
+    {"20", "continue"},
+    {"21", "default"},
+    {"22", "delete"},
+    {"23", "do"},
+    {"24", "dost"},
+    {"25", "double"},
+    {"26", "enum"},
+    {"27", "explicit"},
+    {"28", "export"},
+    {"29", "extern"},
+    {"30", "for"},
+    {"31", "goto"},
+    {"32", "inline"},
+    {"33", "input->"},
+    {"34", "long"},
+    {"35", "mutable"},
+    {"36", "namespace"},
+    {"37", "new"},
+    {"38", "operator"},
+    {"39", "output<-"},
+    {"40", "private"},
+    {"41", "protected"},
+    {"42", "public"},
+    {"43", "register"},
+    {"44", "short"},
+    {"45", "signed"},
+    {"46", "sizeof"},
+    {"47", "static"},
+    {"48", "struct"},
+    {"49", "switch"},
+    {"50", "template"},
+    {"51", "this"},
+    {"52", "throw"},
+    {"53", "try"},
+    {"54", "typedef"},
+    {"55", "typeid"},
+    {"56", "typename"},
+    {"57", "union"},
+    {"58", "unsigned"},
+    {"59", "using"},
+    {"60", "virtual"},
+    {"61", "volatile"},
+    {"62", "while"},
+};
+std::unordered_map<string, int> symbol_table{};
+std::unordered_map<string, int> literal_table{};
 class LexicalAnalyzer {
 private:
     //Data Structures
@@ -98,70 +229,6 @@ private:
         {23, {{'0', 22}, {'1', 22}, {'2', 22}, {'3', 22}, {'4', 22}, {'5', 22}, {'6', 22}, {'7', 22}, {'8', 22}, {'9', 22}}},
         {24, {{'e', -1}, {'E', -1}, {'a', -1}, {'b', -1}, {'c', -1}, {'d', -1}, {'f', -1}, {'g', -1}, {'h', -1}, {'i', -1}, {'j', -1}, {'k', -1}, {'l', -1}, {'m', -1}, {'n', -1}, {'o', -1}, {'p', -1}, {'q', -1}, {'r', -1}, {'s', -1}, {'t', -1}, {'u', -1}, {'v', -1}, {'w', -1}, {'x', -1}, {'y', -1}, {'z', -1}, {'A', -1}, {'B', -1}, {'C', -1}, {'D', -1}, {'F', -1}, {'G', -1}, {'H', -1}, {'I', -1}, {'J', -1}, {'K', -1}, {'L', -1}, {'M', -1}, {'N', -1}, {'O', -1}, {'P', -1}, {'Q', -1}, {'R', -1}, {'S', -1}, {'T', -1}, {'U', -1}, {'V', -1}, {'W', -1}, {'X', -1}, {'Y', -1}, {'Z', -1}, {'_', -1}, {'0', -1}, {'1', -1}, {'2', -1}, {'3', -1}, {'4', -1}, {'5', -1}, {'6', -1}, {'7', -1}, {'8', -1}, {'9', -1}, {'{', -1}, {'}', -1}, {'[', -1}, {',', -1}, {']', -1}, {'(', -1}, {')', -1}, {':', -1}, {'=', -1}, {'!', -1}, {'>', -1}, {'<', -1}, {'&', -1}, {'|', -1}, {'+', -1}, {'-', -1}, {'%', -1}, {'*', -1}, {'/', -1}, {'.', -1}, {' ', -1}, {'\t', -1}, {'\r', -1}, {'\n', -1}, {'\0', -1}}},
     };
-    std::unordered_map<std::string, int> keywords_table = {
-    {"Adadi", 1},
-    {"Agar", 2},
-    {"Ashriya", 3},
-    {"False", 4},
-    {"Harf", 5},
-    {"Khali", 6},
-    {"Mantiqi", 7},
-    {"Marqazi", 8},
-    {"Matn", 9},
-    {"True", 10},
-    {"Wagarna", 11},
-    {"Wapas", 12},
-    {"asm", 13},
-    {"auto", 14},
-    {"break", 15},
-    {"case", 16},
-    {"catch", 17},
-    {"class", 18},
-    {"const", 19},
-    {"continue", 20},
-    {"default", 21},
-    {"delete", 22},
-    {"do", 23},
-    {"dost", 24},
-    {"double", 25},
-    {"enum", 26},
-    {"explicit", 27},
-    {"export", 28},
-    {"extern", 29},
-    {"for", 30},
-    {"goto", 31},
-    {"inline", 32},
-    {"input->", 33},
-    {"long", 34},
-    {"mutable", 35},
-    {"namespace", 36},
-    {"new", 37},
-    {"operator", 38},
-    {"output<-", 39},
-    {"private", 40},
-    {"protected", 41},
-    {"public", 42},
-    {"register", 43},
-    {"short", 44},
-    {"signed", 45},
-    {"sizeof", 46},
-    {"static", 47},
-    {"struct", 48},
-    {"switch", 49},
-    {"template", 50},
-    {"this", 51},
-    {"throw", 52},
-    {"try", 53},
-    {"typedef", 54},
-    {"typeid", 55},
-    {"typename", 56},
-    {"union", 57},
-    {"unsigned", 58},
-    {"using", 59},
-    {"virtual", 60},
-    {"volatile", 61},
-    {"while", 62},
-    };
     std::unordered_map<int, final_state_information> final_states = {
         {3,{false,"id"}},
         {4,{true,"pun"}},
@@ -169,8 +236,7 @@ private:
         {13,{false,"op"}},
         {19,{false,"num"}}
     };
-    std::unordered_map<string,int> symbol_table{};
-    std::unordered_map<string, int> literal_table{};
+
 
     int current_index{};
     int id_index{ 1 };
@@ -290,7 +356,7 @@ protected:
                 complete_lexeme = to_string(literal_table[complete_lexeme]);
 
             string token = "<literal," + complete_lexeme + ">";
-            tokens_file << token;
+            tokens_file << token<<'\n'; //\n added for parser
         }
         else if (ch == '\n')
         {
@@ -337,7 +403,7 @@ protected:
         }
         string token = "<" + final_state.class_type + "," + complete_lexeme + ">";
         cout << token << " ";
-        tokens_file << token;
+        tokens_file << token<<'\n'; //\n added for parser
         clearLexeme();
     }
     void analyzer()
@@ -394,7 +460,7 @@ protected:
                 if (keywords_table.find(complete_lexeme) != keywords_table.end())
                 {
                     complete_lexeme = to_string(keywords_table[complete_lexeme]);
-                    tokens_file << ("<keyword," + complete_lexeme + ">");
+                    tokens_file << ("<keyword," + complete_lexeme + ">")<<'\n';//\n added for parser
                     cout << "<Keyword," + complete_lexeme + ">";
                 }
                 else if ((complete_lexeme == "input" && getNextCharacter() == '-' && getNextNextCharacter() == '>') || (complete_lexeme == "output" && getNextCharacter() == '<' && getNextNextCharacter() == '-'))
@@ -404,7 +470,7 @@ protected:
                     moveToNextCharacter();
                     cout << "<Keyword," + complete_lexeme + ">";
                     complete_lexeme = to_string(keywords_table[complete_lexeme]);
-                    tokens_file << ("<keyword," + complete_lexeme + ">");
+                    tokens_file << ("<keyword," + complete_lexeme + ">")<<'/n';//\n added for parser
                 }
                 else if (transition_table[state].find(' ')!= transition_table[state].end() && final_states.find(transition_table[state][' ']) != final_states.end())
                 {
@@ -456,8 +522,9 @@ protected:
         //Tables
         transition_table.clear();
         final_states.clear();
-        symbol_table.clear();
+        /*symbol_table.clear();
         keywords_table.clear();
+        literal_table.clear()*/
 
         // Close file streams if open
         close_files();
@@ -508,11 +575,383 @@ public:
 };
 
 
+
+
+//-----------------------------------------------------------------------Parser
+struct Token {
+    string type;
+    string val;
+};
+
+class TokenParser {
+    bool next_token;
+    std::ifstream token_file;
+    Token curr_token;
+    int line_number = 0;
+
+public:
+    TokenParser() : next_token(true), token_file("tokens.txt"), curr_token({ "", "" }) {
+        if (!token_file.is_open()) {
+            std::cerr << "Error: Cannot open tokens.txt for Syntax Analyzing Phase.\n";
+            exit(1);
+        }
+    }
+    Token parseToken(const string& str) {
+        Token token;
+
+        // Find the positions of the first '<' and last '>'
+        size_t left = str.find('<');
+        size_t right = str.rfind('>');
+
+        if (left == string::npos || right == string::npos || left >= right) {
+            token.type = "INVALID";
+            token.val = "INVALID";
+            return token;
+        }
+
+        // Extract the inside of the brackets
+        string inside = str.substr(left + 1, right - left - 1);
+
+        // Now split by the first comma
+        size_t comma = inside.find(',');
+
+        if (comma == string::npos) {
+            token.type = "INVALID";
+            token.val = "INVALID";
+            return token;
+        }
+
+        token.type = inside.substr(0, comma);
+        token.val = inside.substr(comma + 1);
+
+        // Trim spaces from type and val
+        auto trim = [](string& s) {
+            size_t start = s.find_first_not_of(" \t\r\n");
+            size_t end = s.find_last_not_of(" \t\r\n");
+            if (start != string::npos && end != string::npos)
+                s = s.substr(start, end - start + 1);
+            else if (start != string::npos)
+                s = s.substr(start);
+            else
+                s.clear();
+            };
+
+        trim(token.type);
+        trim(token.val);
+
+        return token;
+    }
+
+    Token getToken() {
+        if (!next_token) return curr_token;
+
+        next_token = false;
+        curr_token = { "", "" };
+        std::string line;
+
+        while (std::getline(token_file, line)) {
+            line_number++;
+
+            // Remove leading and trailing whitespace
+            size_t start = line.find_first_not_of(" \t\r\n");
+            size_t end = line.find_last_not_of(" \t\r\n");
+
+            if (start == std::string::npos) {
+                continue; // Skip empty lines
+            }
+
+            line = line.substr(start, end - start + 1);
+            curr_token = parseToken(line);
+
+            if (curr_token.type == "INVALID" && curr_token.val == "INVALID") {
+                continue; // Skip invalid token lines
+            }
+
+            break; // Successfully parsed a valid token
+        }
+
+        return curr_token;
+    }
+
+    void advance() {
+        next_token = true;
+    }
+
+    bool areTokenLeft() {
+        return token_file.peek() != EOF;
+    }
+
+    ~TokenParser() {
+        token_file.close();
+    }
+};
+
+
+
+class Parser {
+private:
+    TokenParser tokens;
+
+public:
+    Parser(){}
+
+    // Entry point
+    bool parse() {
+        return tokens.areTokenLeft() && Function();
+    }
+
+
+private:
+    
+    // Parser functions
+    bool match(string orignal, string given)
+    {
+        if(orignal == given) tokens.advance();
+        return orignal == given;
+    }
+    bool Function() {
+        return Type() && match("id", tokens.getToken().type) && match("(", tokens.getToken().val) && ArgList() && match(")", tokens.getToken().val) && CompStmt();
+    }
+
+   /* bool ArgList() {
+        if (Arg()) {
+            while (match(",", tokens.getToken().val)) {
+                if (!Arg()) return false;
+            }
+        }
+        return true;
+    }*/
+    //handel ArgList'
+
+    bool ArgList() {
+        return Arg() && ArgListPrime();
+    }
+    bool ArgListPrime()
+    {
+        if (match(",", tokens.getToken().val)) return Arg() && ArgListPrime();
+        else return true;
+    }
+    bool Arg() {
+        return Type() && match("id", tokens.getToken().type);
+    }
+
+    bool Type() {
+        string t = rkeywords_map[tokens.getToken().val];
+        if (t == "Adadi" || t == "Ashriaqi" || t == "Harf" || t == "Matni" || t == "Mantaqi") {
+            return true;
+        }
+        return false;
+    }
+
+    bool Declaration() {
+        return Type() && IdentList() && match("::", tokens.getToken().val);
+    }
+
+    //bool IdentList() {
+    //    if (!match("id", tokens.getToken().type)) return false;
+    //    while (match(",", tokens.getToken().val)) {
+    //        if (!match("id", tokens.getToken().type)) return false;
+    //    }
+    //    return true;
+    //}
+    bool IdentList() {
+        return match("id", tokens.getToken().type) && IdentListPrime();
+    }
+    bool IdentListPrime() {
+        if (match(",", tokens.getToken().val)) return IdentList();
+        else return true;
+    }
+
+    bool stmt() {
+        return ForStmt() || WhileStmt() || (Expr() && match("::", tokens.getToken().val)) || IfStmt() || CompStmt() || Declaration() || match("::", tokens.getToken().val);
+    }
+
+    bool ForStmt() {
+        return match("for", rkeywords_map[tokens.getToken().val]) && match("(", tokens.getToken().val) && Expr() && match("::", tokens.getToken().val) && OptExpr() && match("::", tokens.getToken().val) && OptExpr() && match(")", tokens.getToken().val) && stmt();
+    }
+
+    bool OptExpr() {
+        return Expr() || true; // epsilon
+    }
+
+    bool WhileStmt() {
+        return match("While", rkeywords_map[tokens.getToken().val]) && match("(", tokens.getToken().val) && Expr() && match(")", tokens.getToken().val) && stmt();
+    }
+
+    bool IfStmt() {
+        return match("Agar", rkeywords_map[tokens.getToken().val]) && match("(", tokens.getToken().val) && Expr() && match(")", tokens.getToken().val) && stmt() && ElsePart();
+    }
+
+    bool ElsePart() {
+        if (match("Wagarna", rkeywords_map[tokens.getToken().val])) {
+            return stmt();
+        }
+        return true; // epsilon
+    }
+
+    bool CompStmt() {
+        return match("{", tokens.getToken().val) && stmtList() && match("}", tokens.getToken().val);
+    }
+
+    bool stmtList() {
+        if (stmt()) return stmtList();
+        else return true;
+        //while (stmt()) {}
+        //return true; // epsilon
+    }
+
+    /*bool Factor() {
+        if (match("(", tokens.getToken().val)) {
+            bool res = Expr();
+            return res && match(")", tokens.getToken().val);
+        }
+        if (match("id", tokens.getToken().type) || match("num", tokens.getToken().type)) return true;
+        return false;
+    }*/
+    bool Factor(){
+        return (match("(", tokens.getToken().val) && Expr() && match(")", tokens.getToken().val)) || match("id", tokens.getToken().type) || match("num", tokens.getToken().type);
+    }
+
+    bool TermPrime() {
+
+        return (match("*", tokens.getToken().val) && Factor()) || (match("/", tokens.getToken().val) && Factor());
+
+        //if (match("*", tokens.getToken().val) || match("/", tokens.getToken().val)) {
+        //    return Factor();
+        //}
+        //return false;
+    }
+
+    bool TermPrimePrime() {
+        if (TermPrime()) return TermPrimePrime();
+        return true;
+        //while (TermPrime()) {}
+        //return true;
+    }
+
+    bool Term() {
+        return (match("(", tokens.getToken().val) && Expr() && match(")", tokens.getToken().val) && TermPrimePrime()) || (match("id", tokens.getToken().type) && TermPrimePrime()) || (match("num", tokens.getToken().type) && TermPrimePrime());
+
+        /*if (match("(", tokens.getToken().val)) {
+            bool res = Expr();
+            return res && match(")", tokens.getToken().val) && TermPrimePrime();
+        }
+        if (match("id", tokens.getToken().type) || match("num", tokens.getToken().type)) {
+            return TermPrimePrime();
+        }
+        return false;*/
+    }
+
+    bool MagPrime() {
+        return ((match("+", tokens.getToken().val) && Term()) || (match("-", tokens.getToken().val))&&Term());
+
+        /*if (match("+", tokens.getToken().val) || match("-", tokens.getToken().val)) {
+            return Term();
+        }
+        return false;*/
+    }
+
+    bool MagPrimePrime() {
+        if (MagPrime()) return MagPrimePrime();
+        return true;
+        //while (MagPrime()) {}
+        //return true;
+    }
+
+    bool Mag() {
+        return (match("(", tokens.getToken().val) && Expr() && match(")", tokens.getToken().val) && TermPrimePrime() && MagPrimePrime()) || (match("id", tokens.getToken().type) && TermPrimePrime() && MagPrimePrime()) || (match("num", tokens.getToken().type) && TermPrimePrime() && MagPrimePrime());
+
+       /* if (match("(", tokens.getToken().val)) {
+            bool res = Expr();
+            return res && match(")", tokens.getToken().val) && TermPrimePrime() && MagPrimePrime();
+        }
+        if (match("id", tokens.getToken().type) || match("num", tokens.getToken().type)) {
+            return TermPrimePrime() && MagPrimePrime();
+        }
+        return false;*/
+    }
+
+    bool Compare() {
+        string t = tokens.getToken().val;
+        if (t == "==" || t == "<" || t == ">" || t == "<=" || t == ">=" || t == "!=" || t == "<>") {
+            return true;
+        }
+        return false;
+    }
+
+    bool RvaluePrime() {
+        if (Compare()) {
+            return Mag() && RvaluePrime();
+        }
+        return true;
+    }
+
+    bool Rvalue() {
+        return (match("(", tokens.getToken().val) && Expr() && match(")", tokens.getToken().val) && HeHe()) || (match("id", tokens.getToken().type) && HeHe()) || (match("num", tokens.getToken().type) && HeHe());
+        /*if (match("(", tokens.getToken().val)) {
+            bool res = Expr();
+            return res && match(")", tokens.getToken().val) && HeHe();
+        }
+        if (match("id", tokens.getToken().type) || match("num", tokens.getToken().type)) {
+            return HeHe();
+        }
+        return false;*/
+    }
+
+    bool HeHe() {
+        return TermPrimePrime() && MagPrimePrime() && RvaluePrime();
+    }
+
+    
+    bool Expr() {
+        return (match("id", tokens.getToken().type) && HaHa()) || (match("(", tokens.getToken().val) && Expr() && match(")", tokens.getToken().val) && HeHe()) || (match("num", tokens.getToken().type) && HeHe());
+
+        /*if (match("id", tokens.getToken().type) || match("num", tokens.getToken().type) || match("(", tokens.getToken().val)) {
+            return HaHa();
+        }
+        return false;*/
+    }
+
+    bool HaHa() {
+        return (match(":=", tokens.getToken().val) && Expr()) || HeHe();
+        //if (match(":=", tokens.getToken().val)) {
+        //    return Expr();
+        //}
+        //return HaHa();
+    }
+
+
+};
+
+// Main function
 int main() {
-    
-    cout << "Analyzing Source Code...\n";
-    LexicalAnalyzer* sad = new LexicalAnalyzer("input.txt");
-    delete sad;
-    
+     Parser parser;
+    if (parser.parse()) {
+        cout << "Accepted\n";
+    }
+    else {
+        cout << "Rejected\n";
+    }
+
     return 0;
 }
+
+
+
+//int main() {
+//    
+//    cout << "Analyzing Source Code...\n";
+//    LexicalAnalyzer* sad = new LexicalAnalyzer("input.txt");
+//    delete sad;
+//
+//    TokenParser parser;
+//
+//    while (parser.areTokenLeft()) {
+//        Token t = parser.getToken();
+//        cout << "Type: " << t.type << ", Value: " << t.val << endl;
+//        parser.advance();
+//    }
+//
+//    
+//    return 0;
+//}
