@@ -1,9 +1,11 @@
-cc 3
-Hello 1
-c 2
-Error 7
-Compiler Construction 4
-Valid Condition 5
-Invalid Condition 6
-Assignment and Comparison Operators 8
-Ok 9
+Pass 1
+Invalid Condition 8
+Fail 2
+cc 5
+Hello 3
+c 4
+Compiler Construction 6
+Valid Condition 7
+Error 9
+Assignment and Comparison Operators 10
+Ok 11

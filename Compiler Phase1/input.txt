@@ -1,3 +1,52 @@
+Adadi sum_(Adadi a_, Adadi b_) {
+    Adadi result_ ::
+    result_ := a_ + b_ ::
+    return_ result_ ::
+}
+
+Ashriya calculate_average_(Ashriya x_, Ashriya y_, Ashriya z_) {
+    Ashriya total_, average_ ::
+    total_ := x_ + y_ + z_ ::
+    average_ := total_ / 3 ::
+
+    Agar (average_ > 50) {
+        print_("Pass") ::
+    }
+    Wagarna {
+        print_("Fail") ::
+    }
+
+    return_ average_ ::
+}
+
+Mantiqi check_even_(Adadi num_) {
+    Mantiqi is_even_ ::
+    is_even_ := (num_ % 2 == 0) ::
+    return_ is_even_ ::
+}
+
+Ashriya main_() {
+    Adadi i_ ::
+    for (i_ := 0 :: i_ < 10 :: i_ := i_ + 1) {
+        print_(i_) ::
+    }
+
+    Adadi res_ ::
+    res_ := sum_(5, 10) ::
+    print_(res_) ::
+
+    Ashriya avg_ ::
+    avg_ := calculate_average_(60.0, 70.0, 80.0) ::
+    print_(avg_) ::
+
+    Mantiqi even_check_ ::
+    even_check_ := check_even_(4) ::
+
+    return_ 0 ::
+}
+
+-------------
+
 :=0;
 : = 
 

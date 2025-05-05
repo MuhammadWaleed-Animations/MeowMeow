@@ -1,10 +1,11 @@
-#include <iostream>
+﻿#include <iostream>
 #include <fstream>
 #include <string>
 #include <sstream>
 #include <cctype>
 #include <unordered_map>
 #include <vector>
+#include <stack>
 using namespace std;
 
 std::unordered_map<std::string, int> keywords_table = {
@@ -142,66 +143,66 @@ private:
     //Data Structures
     template<typename T, int SIZE>
     class meow_queue {
-        private:
-            static const int HALF_SIZE = SIZE / 2;
-            int start, end, size;
-            T buffer1[HALF_SIZE]{};
-            T buffer2[HALF_SIZE]{};
+    private:
+        static const int HALF_SIZE = SIZE / 2;
+        int start, end, size;
+        T buffer1[HALF_SIZE]{};
+        T buffer2[HALF_SIZE]{};
 
-        public:
-            meow_queue() : start(0), end(0), size(SIZE) {}
+    public:
+        meow_queue() : start(0), end(0), size(SIZE) {}
 
-            bool empty() {
-                return size == SIZE;
+        bool empty() {
+            return size == SIZE;
+        }
+
+        bool full() {
+            return size == 0;
+        }
+
+        void push(T element) {
+            if (full()) throw std::out_of_range("Queue is full");
+
+            if (end < HALF_SIZE) {
+                buffer1[end] = element;
+            }
+            else {
+                buffer2[end - HALF_SIZE] = element;
             }
 
-            bool full() {
-                return size == 0;
-            }
+            end = (end + 1) % SIZE;
+            size--;
+        }
 
-            void push(T element) {
-                if (full()) throw std::out_of_range("Queue is full");
+        void pop() {
+            if (empty()) throw std::out_of_range("Queue is Empty");
 
-                if (end < HALF_SIZE) {
-                    buffer1[end] = element;
-                }
-                else {
-                    buffer2[end - HALF_SIZE] = element;
-                }
+            start = (start + 1) % SIZE;
+            size++;
+        }
 
-                end = (end + 1) % SIZE;
-                size--;
-            }
+        T front() {
+            if (empty()) throw std::out_of_range("Queue is Empty");
 
-            void pop() {
-                if (empty()) throw std::out_of_range("Queue is Empty");
+            return (start < HALF_SIZE) ? buffer1[start] : buffer2[start - HALF_SIZE];
+        }
 
-                start = (start + 1) % SIZE;
-                size++;
-            }
+        T peek_next_front() {
+            if (get_size() < 2) throw std::out_of_range("Queue is of size < 2");
+            int next_start = (start + 1) % SIZE;
+            return (next_start < HALF_SIZE) ? buffer1[next_start] : buffer2[next_start - HALF_SIZE];
+        }
 
-            T front() {
-                if (empty()) throw std::out_of_range("Queue is Empty");
+        T back() {
+            if (empty()) throw std::out_of_range("Queue is Empty");
 
-                return (start < HALF_SIZE) ? buffer1[start] : buffer2[start - HALF_SIZE];
-            }
+            int last_index = (end == 0) ? SIZE - 1 : end - 1;
+            return (last_index < HALF_SIZE) ? buffer1[last_index] : buffer2[last_index - HALF_SIZE];
+        }
 
-            T peek_next_front() {
-                if (get_size() < 2) throw std::out_of_range("Queue is of size < 2");
-                int next_start = (start + 1) % SIZE;
-                return (next_start < HALF_SIZE) ? buffer1[next_start] : buffer2[next_start - HALF_SIZE];
-            }
-
-            T back() {
-                if (empty()) throw std::out_of_range("Queue is Empty");
-
-                int last_index = (end == 0) ? SIZE - 1 : end - 1;
-                return (last_index < HALF_SIZE) ? buffer1[last_index] : buffer2[last_index - HALF_SIZE];
-            }
-
-            int get_size() {
-                return SIZE - size;
-            }
+        int get_size() {
+            return SIZE - size;
+        }
     };
     struct final_state_information {
         bool advance = false;
@@ -251,13 +252,13 @@ private:
 
     //Input Buffer
     static const int BUFFER_SIZE = 25;
-    meow_queue<char,BUFFER_SIZE*2> input_buffer;
+    meow_queue<char, BUFFER_SIZE * 2> input_buffer;
     int lexeme_begin{};
-    int lexeme_end{};    
+    int lexeme_end{};
 
     //lexeme handler
     ostringstream lexeme{};
-   
+
 protected:
     char getNextCharacter()
     {
@@ -266,7 +267,7 @@ protected:
     }
     char getNextNextCharacter()
     {
-        if (input_buffer.get_size()<2) return '\0'; //eof
+        if (input_buffer.get_size() < 2) return '\0'; //eof
         return input_buffer.peek_next_front();
     }
     void moveToNextCharacter()
@@ -303,7 +304,7 @@ protected:
         lexeme.clear();   // Clear any error flags
         lexeme.seekp(0);  // Reset the write position (optional)
     }
-    void commentRemover(char &ch)
+    void commentRemover(char& ch)
     {
         if (ch == '/' && getNextNextCharacter() == '/')
         {
@@ -333,7 +334,7 @@ protected:
             ch = getNextCharacter();
         }
     }
-    void literalMaker(char&ch)
+    void literalMaker(char& ch)
     {
         moveToNextCharacter();
         ch = getNextCharacter();
@@ -342,7 +343,7 @@ protected:
             lexeme.put(ch);
             moveToNextCharacter();
             ch = getNextCharacter();
-        }        
+        }
         string complete_lexeme = lexeme.str();
         if (ch == '\"')
         {
@@ -356,7 +357,7 @@ protected:
                 complete_lexeme = to_string(literal_table[complete_lexeme]);
 
             string token = "<literal," + complete_lexeme + ">";
-            tokens_file << token<<'\n'; //\n added for parser
+            tokens_file << token << '\n'; //\n added for parser
         }
         else if (ch == '\n')
         {
@@ -374,7 +375,7 @@ protected:
         moveToNextCharacter();
         ch = getNextCharacter();
     }
-    void finalStateHandler(int& state,char& ch)
+    void finalStateHandler(int& state, char& ch)
     {
         final_state_information final_state = final_states[state];
         if (final_state.advance)
@@ -403,7 +404,7 @@ protected:
         }
         string token = "<" + final_state.class_type + "," + complete_lexeme + ">";
         cout << token << " ";
-        tokens_file << token<<'\n'; //\n added for parser
+        tokens_file << token << '\n'; //\n added for parser
         clearLexeme();
     }
     void analyzer()
@@ -428,7 +429,7 @@ protected:
                 if (ch == '\"')
                     literalMaker(ch);
             }
-                
+
             //if (transition_table[24].find(ch) == transition_table[24].end()) //24 is state that have all valid language characters mapped to somewhere
             //{
             //    //lexical error
@@ -438,7 +439,7 @@ protected:
             //    errors_file << token;
             //    ch = ' ';
             //}
-            if(transition_table.find(state) != transition_table.end() && transition_table[state].find(ch) != transition_table[state].end())
+            if (transition_table.find(state) != transition_table.end() && transition_table[state].find(ch) != transition_table[state].end())
             {
                 //cout << "---" << state << "," << ch;
                 state = transition_table[state][ch];
@@ -452,15 +453,15 @@ protected:
                     if (!isspace(ch))
                         lexeme.put(ch);
                 }
-                
-                
+
+
 
                 string complete_lexeme = lexeme.str();
                 //cout << "\n Complete Lexeme " << complete_lexeme << "\n";
                 if (keywords_table.find(complete_lexeme) != keywords_table.end())
                 {
                     complete_lexeme = to_string(keywords_table[complete_lexeme]);
-                    tokens_file << ("<keyword," + complete_lexeme + ">")<<'\n';//\n added for parser
+                    tokens_file << ("<keyword," + complete_lexeme + ">") << '\n';//\n added for parser
                     cout << "<Keyword," + complete_lexeme + ">";
                 }
                 else if ((complete_lexeme == "input" && getNextCharacter() == '-' && getNextNextCharacter() == '>') || (complete_lexeme == "output" && getNextCharacter() == '<' && getNextNextCharacter() == '-'))
@@ -470,14 +471,14 @@ protected:
                     moveToNextCharacter();
                     cout << "<Keyword," + complete_lexeme + ">";
                     complete_lexeme = to_string(keywords_table[complete_lexeme]);
-                    tokens_file << ("<keyword," + complete_lexeme + ">")<<'/n';//\n added for parser
+                    tokens_file << ("<keyword," + complete_lexeme + ">") << '/n';//\n added for parser
                 }
-                else if (transition_table[state].find(' ')!= transition_table[state].end() && final_states.find(transition_table[state][' ']) != final_states.end())
+                else if (transition_table[state].find(' ') != transition_table[state].end() && final_states.find(transition_table[state][' ']) != final_states.end())
                 {
                     finalStateHandler(transition_table[state][' '], ch);
                     moveToNextCharacter();
                     lexeme.put(ch);
-                    string lexical_error_token = "<Error," + lexeme.str()+">";
+                    string lexical_error_token = "<Error," + lexeme.str() + ">";
                     cout << lexical_error_token;
                     errors_file << lexical_error_token;
                     state = 0;
@@ -491,7 +492,7 @@ protected:
 
                 clearLexeme();
                 state = 0; //error
-                
+
                 continue;
             }
             //if(! (final_states.find(state) != final_states.end() && !final_states[state].advance))
@@ -499,12 +500,12 @@ protected:
             if (final_states.find(state) != final_states.end())
             {
                 finalStateHandler(state, ch);
-                state = 0;               
-            }  
+                state = 0;
+            }
             else
             {
                 moveToNextCharacter();
-                if(!isspace(ch))
+                if (!isspace(ch))
                     lexeme.put(ch);
             }
         }
@@ -513,7 +514,7 @@ protected:
     void writeTables()
     {
         for (auto entry : symbol_table)
-            symbol_table_file << (entry.first+ " " + to_string(entry.second) + "\n");
+            symbol_table_file << (entry.first + " " + to_string(entry.second) + "\n");
 
         for (auto entry : literal_table)
             literal_table_file << (entry.first + " " + to_string(entry.second) + "\n");
@@ -540,8 +541,8 @@ protected:
     }
 
 public:
-    LexicalAnalyzer(string input_file_name = "input.txt", string symbol_table_file_name = "symbol_table.txt",string token_file_name = "tokens.txt",string errors_file_name = "errors.txt",string literal_table_file_name = "literal_table.txt") :lexeme_begin(0), lexeme_end(0), input_file(input_file_name), symbol_table_file(symbol_table_file_name), tokens_file(token_file_name), errors_file(errors_file_name),literal_table_file(literal_table_file_name), input_buffer{}, current_index(0), lexeme(), id_index(1), literal_index(1)
-    {        
+    LexicalAnalyzer(string input_file_name = "input.txt", string symbol_table_file_name = "symbol_table.txt", string token_file_name = "tokens.txt", string errors_file_name = "errors.txt", string literal_table_file_name = "literal_table.txt") :lexeme_begin(0), lexeme_end(0), input_file(input_file_name), symbol_table_file(symbol_table_file_name), tokens_file(token_file_name), errors_file(errors_file_name), literal_table_file(literal_table_file_name), input_buffer{}, current_index(0), lexeme(), id_index(1), literal_index(1)
+    {
         if (!input_file) {
             cerr << "Input File not found!\n Check if the file is within the project.\n";
             close_files();
@@ -569,7 +570,7 @@ public:
     }
     ~LexicalAnalyzer()
     {
-        cleanup();    
+        cleanup();
         cout << "\nLexical Analysis Complete\n";
     }
 };
@@ -692,240 +693,529 @@ class Parser {
 private:
     TokenParser tokens;
 
-public:
-    Parser(){}
+    // Node structure for the parse tree
+    struct ParseNode {
+        string name;
+        vector<ParseNode*> children;
+        string tokenValue; // For leaf nodes (tokens)
+        bool isToken;
 
-    // Entry point
-    bool parse() {
-        return tokens.areTokenLeft() && Function();
-    }
+        ParseNode(const string& nodeName, bool token = false, const string& value = "")
+            : name(nodeName), isToken(token), tokenValue(value) {}
 
-
-private:
-    
-    // Parser functions
-    bool match(string orignal, string given)
-    {
-        if(orignal == given) tokens.advance();
-        return orignal == given;
-    }
-    bool Function() {
-        return Type() && match("id", tokens.getToken().type) && match("(", tokens.getToken().val) && ArgList() && match(")", tokens.getToken().val) && CompStmt();
-    }
-
-   /* bool ArgList() {
-        if (Arg()) {
-            while (match(",", tokens.getToken().val)) {
-                if (!Arg()) return false;
+        ~ParseNode() {
+            for (auto child : children) {
+                delete child;
             }
         }
-        return true;
-    }*/
-    //handel ArgList'
+    };
+
+    ParseNode* root = nullptr;
+    stack<ParseNode*> nodeStack;
+
+    ParseNode* createNode(const string& nodeName) {
+        ParseNode* node = new ParseNode(nodeName);
+
+        // If we have a parent node on the stack, add this as a child
+        if (!nodeStack.empty()) {
+            nodeStack.top()->children.push_back(node);
+        }
+        else {
+            // This is the root node
+            root = node;
+        }
+
+        return node;
+    }
+
+    void addTokenNode(const string& tokenType, const string& tokenValue) {
+        if (!nodeStack.empty()) {
+            ParseNode* tokenNode = new ParseNode(tokenType, true, tokenValue);
+            nodeStack.top()->children.push_back(tokenNode);
+        }
+    }
+
+    bool match(string expectedType, string given) {
+        if (expectedType == given) {
+            // Add token to parse tree
+            addTokenNode(expectedType, tokens.getToken().val);
+            tokens.advance();
+            return true;
+        }
+        return false;
+    }
+
+    // Print the parse tree with nice formatting
+    void printTree(ParseNode* node, string prefix = "", bool isLast = true) {
+        if (node == nullptr) return;
+
+        // Print current node
+        cout << prefix;
+        std::cout << (isLast ? "`-- " : "|-- ");
+
+
+        if (node->isToken) {
+            cout << node->name << " : " << node->tokenValue << endl;
+        }
+        else {
+            cout << node->name << endl;
+        }
+
+        // Print children with appropriate prefixes
+        prefix += isLast ? "    " : "|   ";
+
+        for (size_t i = 0; i < node->children.size(); ++i) {
+            printTree(node->children[i], prefix, i == node->children.size() - 1);
+        }
+    }
+
+public:
+    Parser() {}
+
+    ~Parser() {
+        delete root; // Clean up the entire tree
+    }
+
+    bool parse() {
+        bool result = tokens.areTokenLeft() && Function();
+
+        // // After parsing, print the parse tree
+        // if (result) {
+        //     cout << "\n===== Parse Tree =====\n";
+        //     printTree(root);
+        // }
+
+        printTree(root);
+
+        return result;
+    }
+
+private:
+    bool Function() {
+        ParseNode* node = createNode("Function");
+        nodeStack.push(node);
+
+        bool result = Type() && match("id", tokens.getToken().type) &&
+            match("(", tokens.getToken().val) &&
+            ArgList() &&
+            match(")", tokens.getToken().val) &&
+            CompStmt();
+
+        nodeStack.pop();
+        return result;
+    }
 
     bool ArgList() {
-        return Arg() && ArgListPrime();
+        ParseNode* node = createNode("ArgList");
+        nodeStack.push(node);
+
+        bool result = Arg() && ArgListPrime();
+
+        nodeStack.pop();
+        return result;
     }
-    bool ArgListPrime()
-    {
-        if (match(",", tokens.getToken().val)) return Arg() && ArgListPrime();
-        else return true;
+
+    bool ArgListPrime() {
+        ParseNode* node = createNode("ArgListPrime");
+        nodeStack.push(node);
+
+        bool result = true;
+        if (match(",", tokens.getToken().val)) {
+            result = Arg() && ArgListPrime();
+        }
+
+        nodeStack.pop();
+        return result;
     }
+
     bool Arg() {
-        return Type() && match("id", tokens.getToken().type);
+        ParseNode* node = createNode("Arg");
+        nodeStack.push(node);
+
+        bool result = Type() && match("id", tokens.getToken().type);
+
+        nodeStack.pop();
+        return result;
     }
 
     bool Type() {
+
+
         string t = rkeywords_map[tokens.getToken().val];
-        if (t == "Adadi" || t == "Ashriaqi" || t == "Harf" || t == "Matni" || t == "Mantaqi") {
-            return true;
+        bool result = (t == "Adadi" || t == "Ashriya" || t == "Harf" || t == "Matn" || t == "Mantiqi");
+
+        if (result) {
+            ParseNode* node = createNode("Type");
+            nodeStack.push(node);
+            addTokenNode("keyword", t);
+            tokens.advance();
         }
-        return false;
+
+        nodeStack.pop();
+        return result;
     }
 
     bool Declaration() {
-        return Type() && IdentList() && match("::", tokens.getToken().val);
+        ParseNode* node = createNode("Declaration");
+        nodeStack.push(node);
+
+        bool result = Type() && IdentList() && match("::", tokens.getToken().val);
+
+        nodeStack.pop();
+        return result;
     }
 
-    //bool IdentList() {
-    //    if (!match("id", tokens.getToken().type)) return false;
-    //    while (match(",", tokens.getToken().val)) {
-    //        if (!match("id", tokens.getToken().type)) return false;
-    //    }
-    //    return true;
-    //}
     bool IdentList() {
-        return match("id", tokens.getToken().type) && IdentListPrime();
+        ParseNode* node = createNode("IdentList");
+        nodeStack.push(node);
+
+        bool result = match("id", tokens.getToken().type) && IdentListPrime();
+
+        nodeStack.pop();
+        return result;
     }
+
     bool IdentListPrime() {
-        if (match(",", tokens.getToken().val)) return IdentList();
-        else return true;
+        ParseNode* node = createNode("IdentListPrime");
+        nodeStack.push(node);
+
+        bool result = true;
+        if (match(",", tokens.getToken().val)) {
+            result = IdentList();
+        }
+
+        nodeStack.pop();
+        return result;
     }
 
     bool stmt() {
-        return ForStmt() || WhileStmt() || (Expr() && match("::", tokens.getToken().val)) || IfStmt() || CompStmt() || Declaration() || match("::", tokens.getToken().val);
-    }
+        ParseNode* node = createNode("stmt");
+        nodeStack.push(node);
 
+        bool result = false;
+        if (match("for", rkeywords_map[tokens.getToken().val]))
+            result = ForStmt();
+        else if (match("While", rkeywords_map[tokens.getToken().val]))
+            result = WhileStmt();
+        else if (match("id", tokens.getToken().type))
+            result = HaHa();
+        else if (match("(", tokens.getToken().val))
+            result = Expr() && match(")", tokens.getToken().val) && HeHe();
+        else if (match("num", tokens.getToken().type))
+            result = HeHe();
+        else if (match("Agar", rkeywords_map[tokens.getToken().val]))
+            result = IfStmt();
+        else if (match("{", tokens.getToken().val))
+            result = CompStmt() && stmtList();
+        else
+            result = (match("::", tokens.getToken().val) || Declaration());
+
+
+
+        nodeStack.pop();
+        return result;
+    }
+    bool CompStmtPrime() {
+        ParseNode* node = createNode("CompStmt");
+        nodeStack.push(node);
+
+        bool result = stmtList() &&
+            match("}", tokens.getToken().val);
+
+        nodeStack.pop();
+        return result;
+    }
     bool ForStmt() {
-        return match("for", rkeywords_map[tokens.getToken().val]) && match("(", tokens.getToken().val) && Expr() && match("::", tokens.getToken().val) && OptExpr() && match("::", tokens.getToken().val) && OptExpr() && match(")", tokens.getToken().val) && stmt();
+        ParseNode* node = createNode("ForStmt");
+        nodeStack.push(node);
+
+        bool result = match("(", tokens.getToken().val) &&
+            Expr() &&
+            match("::", tokens.getToken().val) &&
+            OptExpr() &&
+            match("::", tokens.getToken().val) &&
+            OptExpr() &&
+            match(")", tokens.getToken().val) &&
+            stmt();
+
+        nodeStack.pop();
+        return result;
     }
 
     bool OptExpr() {
-        return Expr() || true; // epsilon
+        ParseNode* node = createNode("OptExpr");
+        nodeStack.push(node);
+
+        bool result = true;
+        if (match("id", tokens.getToken().type))
+            result = HaHa();
+        else if (match("(", tokens.getToken().val))
+            result = Expr() && match(")", tokens.getToken().val) && HeHe();
+        else if (match("num", tokens.getToken().type))
+            result = HeHe();
+
+        nodeStack.pop();
+        return result;
     }
 
     bool WhileStmt() {
-        return match("While", rkeywords_map[tokens.getToken().val]) && match("(", tokens.getToken().val) && Expr() && match(")", tokens.getToken().val) && stmt();
+        ParseNode* node = createNode("WhileStmt");
+        nodeStack.push(node);
+
+        bool result = match("(", tokens.getToken().val) &&
+            Expr() &&
+            match(")", tokens.getToken().val) &&
+            stmt();
+
+        nodeStack.pop();
+        return result;
     }
 
     bool IfStmt() {
-        return match("Agar", rkeywords_map[tokens.getToken().val]) && match("(", tokens.getToken().val) && Expr() && match(")", tokens.getToken().val) && stmt() && ElsePart();
+        ParseNode* node = createNode("IfStmt");
+        nodeStack.push(node);
+
+        bool result = match("(", tokens.getToken().val) &&
+            Expr() &&
+            match(")", tokens.getToken().val) &&
+            stmt() &&
+            ElsePart();
+
+        nodeStack.pop();
+        return result;
     }
 
     bool ElsePart() {
+        ParseNode* node = createNode("ElsePart");
+        nodeStack.push(node);
+
+        bool result = true;
         if (match("Wagarna", rkeywords_map[tokens.getToken().val])) {
-            return stmt();
+            result = stmt();
         }
-        return true; // epsilon
+
+        nodeStack.pop();
+        return result;
     }
 
     bool CompStmt() {
-        return match("{", tokens.getToken().val) && stmtList() && match("}", tokens.getToken().val);
+        ParseNode* node = createNode("CompStmt");
+        nodeStack.push(node);
+
+        bool result = match("{", tokens.getToken().val) &&
+            stmtList() &&
+            match("}", tokens.getToken().val);
+
+        nodeStack.pop();
+        return result;
     }
 
     bool stmtList() {
-        if (stmt()) return stmtList();
-        else return true;
-        //while (stmt()) {}
-        //return true; // epsilon
-    }
+        ParseNode* node = createNode("stmtList");
+        nodeStack.push(node);
 
-    /*bool Factor() {
-        if (match("(", tokens.getToken().val)) {
-            bool res = Expr();
-            return res && match(")", tokens.getToken().val);
+        bool result = true;
+        if (match("for", rkeywords_map[tokens.getToken().val]))
+            result = ForStmt() && stmtList();
+        else if (match("While", rkeywords_map[tokens.getToken().val]))
+            result = WhileStmt() && stmtList();
+        else if (match("id", tokens.getToken().type))
+            result = HaHa() && stmtList();
+        else if (match("(", tokens.getToken().val))
+            result = Expr() && match("::", tokens.getToken().val) && match(")", tokens.getToken().val) && HeHe() && stmtList();
+        else if (match("num", tokens.getToken().type))
+            result = HeHe() && stmtList();
+        else if (match("Agar", rkeywords_map[tokens.getToken().val]))
+            result = IfStmt() && stmtList();
+        else if (match("{", tokens.getToken().val))
+            result = CompStmt() && stmtList();
+        else if (match("::", tokens.getToken().val))
+        {
+            result = stmtList();
         }
-        if (match("id", tokens.getToken().type) || match("num", tokens.getToken().type)) return true;
-        return false;
-    }*/
-    bool Factor(){
-        return (match("(", tokens.getToken().val) && Expr() && match(")", tokens.getToken().val)) || match("id", tokens.getToken().type) || match("num", tokens.getToken().type);
-    }
-
-    bool TermPrime() {
-
-        return (match("*", tokens.getToken().val) && Factor()) || (match("/", tokens.getToken().val) && Factor());
-
-        //if (match("*", tokens.getToken().val) || match("/", tokens.getToken().val)) {
-        //    return Factor();
-        //}
-        //return false;
-    }
-
-    bool TermPrimePrime() {
-        if (TermPrime()) return TermPrimePrime();
-        return true;
-        //while (TermPrime()) {}
-        //return true;
-    }
-
-    bool Term() {
-        return (match("(", tokens.getToken().val) && Expr() && match(")", tokens.getToken().val) && TermPrimePrime()) || (match("id", tokens.getToken().type) && TermPrimePrime()) || (match("num", tokens.getToken().type) && TermPrimePrime());
-
-        /*if (match("(", tokens.getToken().val)) {
-            bool res = Expr();
-            return res && match(")", tokens.getToken().val) && TermPrimePrime();
+        else if (Type())
+        {
+            result = IdentList() && match("::", tokens.getToken().val) && stmtList();
         }
-        if (match("id", tokens.getToken().type) || match("num", tokens.getToken().type)) {
-            return TermPrimePrime();
-        }
-        return false;*/
+
+
+        nodeStack.pop();
+        return result;
     }
 
-    bool MagPrime() {
-        return ((match("+", tokens.getToken().val) && Term()) || (match("-", tokens.getToken().val))&&Term());
-
-        /*if (match("+", tokens.getToken().val) || match("-", tokens.getToken().val)) {
-            return Term();
-        }
-        return false;*/
-    }
-
-    bool MagPrimePrime() {
-        if (MagPrime()) return MagPrimePrime();
-        return true;
-        //while (MagPrime()) {}
-        //return true;
-    }
-
-    bool Mag() {
-        return (match("(", tokens.getToken().val) && Expr() && match(")", tokens.getToken().val) && TermPrimePrime() && MagPrimePrime()) || (match("id", tokens.getToken().type) && TermPrimePrime() && MagPrimePrime()) || (match("num", tokens.getToken().type) && TermPrimePrime() && MagPrimePrime());
-
-       /* if (match("(", tokens.getToken().val)) {
-            bool res = Expr();
-            return res && match(")", tokens.getToken().val) && TermPrimePrime() && MagPrimePrime();
-        }
-        if (match("id", tokens.getToken().type) || match("num", tokens.getToken().type)) {
-            return TermPrimePrime() && MagPrimePrime();
-        }
-        return false;*/
-    }
-
-    bool Compare() {
-        string t = tokens.getToken().val;
-        if (t == "==" || t == "<" || t == ">" || t == "<=" || t == ">=" || t == "!=" || t == "<>") {
-            return true;
-        }
-        return false;
-    }
-
-    bool RvaluePrime() {
-        if (Compare()) {
-            return Mag() && RvaluePrime();
-        }
-        return true;
-    }
-
-    bool Rvalue() {
-        return (match("(", tokens.getToken().val) && Expr() && match(")", tokens.getToken().val) && HeHe()) || (match("id", tokens.getToken().type) && HeHe()) || (match("num", tokens.getToken().type) && HeHe());
-        /*if (match("(", tokens.getToken().val)) {
-            bool res = Expr();
-            return res && match(")", tokens.getToken().val) && HeHe();
-        }
-        if (match("id", tokens.getToken().type) || match("num", tokens.getToken().type)) {
-            return HeHe();
-        }
-        return false;*/
-    }
-
-    bool HeHe() {
-        return TermPrimePrime() && MagPrimePrime() && RvaluePrime();
-    }
-
-    
     bool Expr() {
-        return (match("id", tokens.getToken().type) && HaHa()) || (match("(", tokens.getToken().val) && Expr() && match(")", tokens.getToken().val) && HeHe()) || (match("num", tokens.getToken().type) && HeHe());
+        ParseNode* node = createNode("Expr");
+        nodeStack.push(node);
 
-        /*if (match("id", tokens.getToken().type) || match("num", tokens.getToken().type) || match("(", tokens.getToken().val)) {
-            return HaHa();
-        }
-        return false;*/
+        bool result = false;
+        if (match("id", tokens.getToken().type))
+            result = HaHa();
+        else if (match("(", tokens.getToken().val))
+            result = Expr() && match(")", tokens.getToken().val) && HeHe();
+        else if (match("num", tokens.getToken().type))
+            result = HeHe();
+
+        nodeStack.pop();
+        return result;
     }
 
     bool HaHa() {
-        return (match(":=", tokens.getToken().val) && Expr()) || HeHe();
-        //if (match(":=", tokens.getToken().val)) {
-        //    return Expr();
-        //}
-        //return HaHa();
+        ParseNode* node = createNode("HaHa");
+        nodeStack.push(node);
+
+        bool result = false;
+        if (match(":=", tokens.getToken().val))
+            result = Expr();
+        else
+            result = HeHe();
+
+        nodeStack.pop();
+        return result;
     }
 
+    bool HeHe() {
+        ParseNode* node = createNode("HeHe");
+        nodeStack.push(node);
 
+        bool result = TermPrimePrime() && MagPrimePrime() && RvaluePrime();
+
+        nodeStack.pop();
+        return result;
+    }
+
+    bool RvaluePrime() {
+        ParseNode* node = createNode("RvaluePrime");
+        nodeStack.push(node);
+
+        bool result = true;
+        if (Compare()) result = Mag() && RvaluePrime();
+
+        nodeStack.pop();
+        return result;
+    }
+
+    bool Compare() {
+
+
+        string t = tokens.getToken().val;
+        bool result = (t == "==" || t == "<" || t == ">" || t == "<=" || t == ">=" || t == "!=" || t == "<>");
+
+        if (result) {
+            ParseNode* node = createNode("Compare");
+            nodeStack.push(node);
+            addTokenNode("operator", t);
+            tokens.advance();
+        }
+
+        nodeStack.pop();
+        return result;
+    }
+
+    bool Mag() {
+        ParseNode* node = createNode("Mag");
+        nodeStack.push(node);
+        bool result = false;
+        if (match("id", tokens.getToken().type))
+            result = TermPrimePrime() && MagPrimePrime();
+        else if (match("(", tokens.getToken().val))
+            result = Expr() && match(")", tokens.getToken().val) && TermPrimePrime() && MagPrimePrime();
+        else if (match("num", tokens.getToken().type))
+            result = TermPrimePrime() && MagPrimePrime();
+        nodeStack.pop();
+        return result;
+    }
+
+    bool MagPrime() {
+        ParseNode* node = createNode("MagPrime");
+        nodeStack.push(node);
+
+        bool result = false;
+        if (match("+", tokens.getToken().val))
+            result = Term();
+        else if (match("-", tokens.getToken().val))
+            result = Term();
+
+        nodeStack.pop();
+        return result;
+    }
+
+    bool MagPrimePrime() {
+        ParseNode* node = createNode("MagPrimePrime");
+        nodeStack.push(node);
+
+        bool result = true;
+        if (match("+", tokens.getToken().val))
+            result = Term() && MagPrimePrime();
+        else if (match("-", tokens.getToken().val))
+            result = Term() && MagPrimePrime();
+
+        nodeStack.pop();
+        return result;
+    }
+
+    bool Term() {
+        ParseNode* node = createNode("Term");
+        nodeStack.push(node);
+
+        bool result = false;
+        if (match("id", tokens.getToken().type))
+            result = TermPrimePrime();
+        else if (match("(", tokens.getToken().val))
+            result = Expr() && match(")", tokens.getToken().val) && TermPrimePrime();
+        else if (match("num", tokens.getToken().type))
+            result = TermPrimePrime();
+
+        nodeStack.pop();
+        return result;
+    }
+
+    bool TermPrime() {
+        ParseNode* node = createNode("TermPrime");
+        nodeStack.push(node);
+
+        bool result = false;
+        if (match("*", tokens.getToken().val))
+            result = Factor();
+        else if (match("/", tokens.getToken().val))
+            result = Factor();
+
+        nodeStack.pop();
+        return result;
+    }
+
+    bool TermPrimePrime() {
+        ParseNode* node = createNode("TermPrimePrime");
+        nodeStack.push(node);
+
+        bool result = true;
+        if (match("*", tokens.getToken().val))
+        {
+            result = Factor() && TermPrimePrime();
+        }
+        else if (match("/", tokens.getToken().val))  // else if(result = match("/", tokens.getToken().val)) traitorrrrrrrrrrrrrrrr
+        {
+            result = Factor() && TermPrimePrime();
+        }
+
+        nodeStack.pop();
+        return result;
+    }
+
+    bool Factor() {
+        ParseNode* node = createNode("Factor");
+        nodeStack.push(node);
+
+        bool result = match("id", tokens.getToken().type) ||
+            match("num", tokens.getToken().type) ||
+            (match("(", tokens.getToken().val) && Expr() && match(")", tokens.getToken().val));
+        nodeStack.pop();
+        return result;
+    }
 };
 
 // Main function
 int main() {
-     Parser parser;
+    Parser parser;
     if (parser.parse()) {
         cout << "Accepted\n";
     }
@@ -935,7 +1225,6 @@ int main() {
 
     return 0;
 }
-
 
 
 //int main() {
