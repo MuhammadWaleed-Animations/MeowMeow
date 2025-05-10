@@ -139,6 +139,7 @@ std::unordered_map<std::string, std::string> rkeywords_map = {
 std::unordered_map<string, int> symbol_table{};
 std::unordered_map<string, int> literal_table{};
 class LexicalAnalyzer {
+
 private:
     //Data Structures
     template<typename T, int SIZE>
