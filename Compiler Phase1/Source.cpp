@@ -472,7 +472,7 @@ protected:
                     moveToNextCharacter();
                     cout << "<Keyword," + complete_lexeme + ">";
                     complete_lexeme = to_string(keywords_table[complete_lexeme]);
-                    tokens_file << ("<keyword," + complete_lexeme + ">") << '/n';//\n added for parser
+                    tokens_file << ("<keyword," + complete_lexeme + ">") << "/n";//\n added for parser
                 }
                 else if (transition_table[state].find(' ') != transition_table[state].end() && final_states.find(transition_table[state][' ']) != final_states.end())
                 {
@@ -689,7 +689,6 @@ public:
 };
 
 
-
 class Parser {
 private:
     TokenParser tokens;
@@ -841,6 +840,7 @@ private:
 
     bool Type() {
 
+        if (!(tokens.getToken().type == "keyword")) return false;
 
         string t = rkeywords_map[tokens.getToken().val];
         bool result = (t == "Adadi" || t == "Ashriya" || t == "Harf" || t == "Matn" || t == "Mantiqi");
@@ -850,9 +850,9 @@ private:
             nodeStack.push(node);
             addTokenNode("keyword", t);
             tokens.advance();
+            nodeStack.pop();
         }
 
-        nodeStack.pop();
         return result;
     }
 
@@ -894,9 +894,9 @@ private:
         nodeStack.push(node);
 
         bool result = false;
-        if (match("for", rkeywords_map[tokens.getToken().val]))
+        if (tokens.getToken().type == "keyword" && match("for", rkeywords_map[tokens.getToken().val]))
             result = ForStmt();
-        else if (match("While", rkeywords_map[tokens.getToken().val]))
+        else if (tokens.getToken().type == "keyword" && match("While", rkeywords_map[tokens.getToken().val]))
             result = WhileStmt();
         else if (match("id", tokens.getToken().type))
             result = HaHa();
@@ -904,7 +904,7 @@ private:
             result = Expr() && match(")", tokens.getToken().val) && HeHe();
         else if (match("num", tokens.getToken().type))
             result = HeHe();
-        else if (match("Agar", rkeywords_map[tokens.getToken().val]))
+        else if (tokens.getToken().type == "keyword" && match("Agar", rkeywords_map[tokens.getToken().val]))
             result = IfStmt();
         else if (match("{", tokens.getToken().val))
             result = CompStmt() && stmtList();
@@ -991,7 +991,7 @@ private:
         nodeStack.push(node);
 
         bool result = true;
-        if (match("Wagarna", rkeywords_map[tokens.getToken().val])) {
+        if (tokens.getToken().type == "keyword" && match("Wagarna", rkeywords_map[tokens.getToken().val])) {
             result = stmt();
         }
 
@@ -1016,9 +1016,9 @@ private:
         nodeStack.push(node);
 
         bool result = true;
-        if (match("for", rkeywords_map[tokens.getToken().val]))
+        if (tokens.getToken().type == "keyword" && match("for", rkeywords_map[tokens.getToken().val]))
             result = ForStmt() && stmtList();
-        else if (match("While", rkeywords_map[tokens.getToken().val]))
+        else if (tokens.getToken().type == "keyword" && match("While", rkeywords_map[tokens.getToken().val]))
             result = WhileStmt() && stmtList();
         else if (match("id", tokens.getToken().type))
             result = HaHa() && stmtList();
@@ -1026,7 +1026,7 @@ private:
             result = Expr() && match("::", tokens.getToken().val) && match(")", tokens.getToken().val) && HeHe() && stmtList();
         else if (match("num", tokens.getToken().type))
             result = HeHe() && stmtList();
-        else if (match("Agar", rkeywords_map[tokens.getToken().val]))
+        else if (tokens.getToken().type == "keyword" && match("Agar", rkeywords_map[tokens.getToken().val]))
             result = IfStmt() && stmtList();
         else if (match("{", tokens.getToken().val))
             result = CompStmt() && stmtList();
@@ -1106,9 +1106,9 @@ private:
             nodeStack.push(node);
             addTokenNode("operator", t);
             tokens.advance();
+            nodeStack.pop();
         }
 
-        nodeStack.pop();
         return result;
     }
 
@@ -1214,9 +1214,499 @@ private:
     }
 };
 
-// Main function
+
+class threeAddressCode {
+private:
+    TokenParser tokens;
+
+    ofstream three_address_code_file{};
+    long long int temp_var_counter{ 0 };
+    long long int label_counter{ 0 };
+    string temp_var_prefix{ "t" };
+    string label_prefix{ "L" };
+    std::unordered_map<int, std::string> reverse_symbol_table{};
+    // Node structure for the parse tree
+    struct ParseNode {
+        string name;
+        vector<ParseNode*> children;
+        string tokenValue; // For leaf nodes (tokens)
+        bool isToken;
+
+        ParseNode(const string& nodeName, bool token = false, const string& value = "")
+            : name(nodeName), isToken(token), tokenValue(value) {}
+
+        ~ParseNode() {
+            for (auto child : children) {
+                delete child;
+            }
+        }
+    };
+
+    ParseNode* root = nullptr;
+    stack<ParseNode*> nodeStack;
+
+    ParseNode* createNode(const string& nodeName) {
+        ParseNode* node = new ParseNode(nodeName);
+
+        // If we have a parent node on the stack, add this as a child
+        if (!nodeStack.empty()) {
+            nodeStack.top()->children.push_back(node);
+        }
+        else {
+            // This is the root node
+            root = node;
+        }
+
+        return node;
+    }
+
+    void addTokenNode(const string& tokenType, const string& tokenValue) {
+        if (!nodeStack.empty()) {
+            ParseNode* tokenNode = new ParseNode(tokenType, true, tokenValue);
+            nodeStack.top()->children.push_back(tokenNode);
+        }
+    }
+
+    bool match(string expectedType, string given) {
+        //cout<<"given: "<<given<<"    expected: "<<expectedType<<endl;
+        if (expectedType == given) {
+            // Add token to parse tree
+            addTokenNode(expectedType, tokens.getToken().val);
+            tokens.advance();
+            return true;
+        }
+        return false;
+    }
+
+    // Print the parse tree with nice formatting
+    void printTree(ParseNode* node, string prefix = "", bool isLast = true) {
+        if (node == nullptr) return;
+
+        // Print current node
+        cout << prefix;
+        std::cout << (isLast ? "`-- " : "|-- ");
+
+
+        if (node->isToken) {
+            cout << node->name << " : " << node->tokenValue << endl;
+        }
+        else {
+            cout << node->name << endl;
+        }
+
+        // Print children with appropriate prefixes
+        prefix += isLast ? "    " : "|   ";
+
+        for (size_t i = 0; i < node->children.size(); ++i) {
+            printTree(node->children[i], prefix, i == node->children.size() - 1);
+        }
+    }
+
+public:
+    threeAddressCode() :three_address_code_file("output.tac"), temp_var_counter(0), label_counter(0), temp_var_prefix("t"), label_prefix("L") {
+        if (!three_address_code_file.is_open()) {
+            cerr << "Error: Cannot open three_address_code.txt for writing.\n";
+            exit(1);
+        }
+        //three_address_code_file << "Three Address Code:\n";
+        //three_address_code_file << "=========Working==========\n";
+
+         // Reverse map: int -> string
+
+        for (const auto& pair : symbol_table) {
+            reverse_symbol_table[pair.second] = pair.first;
+        }
+
+    }
+
+    ~threeAddressCode() {
+        delete root; // Clean up the entire tree
+    }
+
+    bool parse() {
+        bool result = tokens.areTokenLeft() && stmt();
+
+        // // After parsing, print the parse tree
+        // if (result) {
+        //     cout << "\n===== Parse Tree =====\n";
+        //     printTree(root);
+        // }
+
+        printTree(root);
+
+        return result;
+    }
+
+private:
+    string new_label() {
+        return label_prefix + to_string(label_counter++);
+    }
+    string new_temp() {
+        return temp_var_prefix + to_string(temp_var_counter++);
+    }
+    bool stmt() {
+        ParseNode* node = createNode("stmt");
+        nodeStack.push(node);
+
+        bool result = false;
+
+        if (tokens.getToken().type == "keyword" && match("while", rkeywords_map[tokens.getToken().val]))
+            result = WhileStmt();
+        else if (tokens.getToken().type == "keyword" && match("Agar", rkeywords_map[tokens.getToken().val]))
+            result = IfStmt();
+        else if (match("{", tokens.getToken().val))
+            result = CompStmt() && stmtList();
+        else
+            result = Expr() && match("::", tokens.getToken().val);
+
+        nodeStack.pop();
+        return result;
+    }
+
+    bool Type() {
+        if (!(tokens.getToken().type == "keyword")) return false;
+
+        string t = rkeywords_map[tokens.getToken().val];
+        bool result = (t == "Adadi" || t == "Ashriya" || t == "Harf" || t == "Matn" || t == "Mantiqi");
+
+        if (result) {
+            ParseNode* node = createNode("Type");
+            nodeStack.push(node);
+            addTokenNode("keyword", t);
+            tokens.advance();
+            nodeStack.pop();
+        }
+
+
+        return result;
+    }
+
+    bool CompStmt() {
+        ParseNode* node = createNode("CompStmt");
+        nodeStack.push(node);
+
+        bool result = stmtList();
+        result = result && match("}", tokens.getToken().val);
+
+        nodeStack.pop();
+        return result;
+    }
+
+    bool WhileStmt() {
+        ParseNode* node = createNode("WhileStmt");
+        nodeStack.push(node);
+        string rvalue_addr = "";
+
+        string begin = new_label();                                          //////////////
+        string end = new_label();                                           //////////////
+        three_address_code_file << begin << ":\n";                         //////////////
+        bool result = match("(", tokens.getToken().val);
+
+        result = result && Rvalue(rvalue_addr);
+        result = result && match(")", tokens.getToken().val);
+
+        three_address_code_file << "if ( !" << rvalue_addr << " ) goto " << end << "\n";    ////////////
+
+        result = result && stmt();
+
+        three_address_code_file << "goto " << begin << "\n";    ////////////
+        three_address_code_file << end << ":\n";               ////////////
+
+        nodeStack.pop();
+        return result;
+    }
+
+    bool IfStmt() {
+        ParseNode* node = createNode("IfStmt");
+        nodeStack.push(node);
+        string rvalue_adder = "";
+        string next = new_label();                                           ////////////// 
+        string end = new_label();                                           //////////////
+
+        bool result = match("(", tokens.getToken().val);
+        result = result && Rvalue(rvalue_adder);
+        result = result && match(")", tokens.getToken().val);
+
+        three_address_code_file << "if ( !" << rvalue_adder << " ) goto " << next << "\n";    ////////////
+
+        result = result && stmt();
+
+        three_address_code_file << "goto " << end << "\n";       ////////////
+        three_address_code_file << next << ":\n";               ////////////
+
+        result = result && ElsePart();
+
+        three_address_code_file << end << ":\n";               ////////////
+
+        nodeStack.pop();
+        return result;
+    }
+
+    bool ElsePart() {
+        ParseNode* node = createNode("ElsePart");
+        nodeStack.push(node);
+
+        bool result = true;
+        if (tokens.getToken().type == "keyword" && match("Wagarna", rkeywords_map[tokens.getToken().val])) {
+            result = stmt();
+        }
+
+        nodeStack.pop();
+        return result;
+    }
+
+    bool stmtList() {
+        ParseNode* node = createNode("stmtList");
+        nodeStack.push(node);
+
+        bool result = true;
+        if (stmt()) result = stmtList();
+
+        nodeStack.pop();
+        return result;
+    }
+
+    bool Expr() {
+        ParseNode* node = createNode("Expr");
+        nodeStack.push(node);
+        string mag_addr = "";
+
+        bool result = true;
+
+        string string_token_val = tokens.getToken().val;    //matching it would loose it so saving it before
+
+        if (match("id", tokens.getToken().type))
+        {
+            int token_val = stoi(string_token_val);
+            result = result && match(":=", tokens.getToken().val);
+            result = result && Mag(mag_addr);
+
+
+            auto it = reverse_symbol_table.find(token_val);
+            if (it != reverse_symbol_table.end()) {
+                three_address_code_file << it->second << " = " << mag_addr << "\n";   ////////////
+            }
+            else {
+                // Optional: handle the error or log it
+                std::cerr << "Error: token_val " << token_val << " not found in reverse_symbol_table.\n";
+            }
+            ////three_address_code_file << reverse_symbol_table[token_val]<< " = " << mag_addr << "\n";
+        }
+
+        nodeStack.pop();
+        return result;
+    }
+
+    bool RelOp(string& op) {
+
+
+        string t = tokens.getToken().val;
+        bool result = (t == "==" || t == "<" || t == ">" || t == "<=" || t == ">=" || t == "<>");
+
+        if (result) {
+
+            op = t;                                                        //////////////
+
+            ParseNode* node = createNode("RelOp");
+            nodeStack.push(node);
+            addTokenNode("operator", t);
+            tokens.advance();
+            nodeStack.pop();
+        }
+
+
+        return result;
+    }
+
+    bool Rvalue(string& rvalue_addr) {
+        ParseNode* node = createNode("Rvalue");
+        nodeStack.push(node);
+        string mag_addr = "";
+
+        bool result = Mag(mag_addr);
+
+        string rvaluePrime_addr = mag_addr; /////////////////
+        result = result && RvaluePrime(rvaluePrime_addr);
+
+        rvalue_addr = rvaluePrime_addr; //////////////////
+        nodeStack.pop();
+        return result;
+    }
+
+    bool RvaluePrime(string& rvaluePrime_addr) {
+        ParseNode* node = createNode("RvaluePrime");
+        nodeStack.push(node);
+        string op = "";
+        string mag_addr = "";
+        string rvaluePrime1_addr = "";
+
+
+        bool result = true;
+        if (RelOp(op))
+        {
+            result = result && Mag(mag_addr);
+
+            rvaluePrime1_addr = new_temp();                                                                                      ////////////
+            three_address_code_file << rvaluePrime1_addr << " = " << rvaluePrime_addr << " " << op << " " << mag_addr << "\n";  ////////////
+            result = result && RvaluePrime(rvaluePrime1_addr);
+
+            rvaluePrime_addr = rvaluePrime1_addr;       ////////////////
+        }
+        nodeStack.pop();
+        return result;
+    }
+
+    bool Mag(string& mag_addr) {
+        ParseNode* node = createNode("Mag");
+        nodeStack.push(node);
+        string magPrime_addr = "";
+        string term_addr = "";
+
+
+        bool result = Term(term_addr);
+
+        magPrime_addr = term_addr;                   /////////////////
+
+        result = result && MagPrime(magPrime_addr);
+
+        mag_addr = magPrime_addr;                   /////////////////
+
+        nodeStack.pop();
+        return result;
+    }
+
+    bool MagPrime(string& magPrime_addr) {
+        ParseNode* node = createNode("MagPrime");
+        nodeStack.push(node);
+        string term_addr = "";
+        string magPrime1_addr = "";
+
+        bool result = true;
+        if (match("+", tokens.getToken().val))
+        {
+            result = Term(term_addr);
+
+            magPrime1_addr = new_temp();                                                                         ////////////
+            three_address_code_file << magPrime1_addr << " = " << magPrime_addr << " + " << term_addr << "\n";  ////////////
+
+            result = result && MagPrime(magPrime1_addr);
+
+            magPrime_addr = magPrime1_addr;                   /////////////////
+        }
+        else if (match("-", tokens.getToken().val))
+        {
+            result = Term(term_addr);
+
+            magPrime1_addr = new_temp();                                                                         ////////////
+            three_address_code_file << magPrime1_addr << " = " << magPrime_addr << " - " << term_addr << "\n";  ////////////
+
+            result = result && MagPrime(magPrime1_addr);
+
+            magPrime_addr = magPrime1_addr;                   /////////////////
+        }
+
+        nodeStack.pop();
+        return result;
+    }
+
+    bool Term(string& term_addr) {
+        ParseNode* node = createNode("Term");
+        nodeStack.push(node);
+        string termPrime_addr = "";
+        string factor_addr = "";
+
+        bool result = Factor(factor_addr);
+
+        termPrime_addr = factor_addr;                   /////////////////
+
+        result = result && TermPrime(termPrime_addr);
+
+        term_addr = termPrime_addr;                   /////////////////
+
+        nodeStack.pop();
+        return result;
+    }
+
+    bool TermPrime(string& termPrime_addr) {
+        ParseNode* node = createNode("TermPrime");
+        nodeStack.push(node);
+        string factor_addr = "";
+        string termPrime1_addr = "";
+
+        bool result = true;
+        if (match("*", tokens.getToken().val))
+        {
+            result = Factor(factor_addr);
+
+            termPrime1_addr = new_temp();                                                                              ////////////
+            three_address_code_file << termPrime1_addr << " = " << termPrime_addr << " * " << factor_addr << "\n";    ////////////
+
+            result = result && TermPrime(termPrime1_addr);
+
+            termPrime_addr = termPrime1_addr;                   /////////////////
+        }
+        else if (match("/", tokens.getToken().val))
+        {
+            result = Factor(factor_addr);
+
+            termPrime1_addr = new_temp();                                                                              ////////////
+            three_address_code_file << termPrime1_addr << " = " << termPrime_addr << " / " << factor_addr << "\n";    ////////////
+
+            result = result && TermPrime(termPrime1_addr);
+
+            termPrime_addr = termPrime1_addr;                   /////////////////
+        }
+
+        nodeStack.pop();
+        return result;
+    }
+
+    bool Factor(string& factor_addr) {
+        ParseNode* node = createNode("Factor");
+        nodeStack.push(node);
+        string mag_addr = "";
+
+        string string_token_val = tokens.getToken().val; //matching it would loose it so saving it before
+
+        bool result = true;
+        if (match("id", tokens.getToken().type)) {
+            int token_val = stoi(string_token_val);
+            auto it = reverse_symbol_table.find(token_val);
+            if (it != reverse_symbol_table.end()) {
+                factor_addr = it->second;                               ////////////////
+            }
+            else {
+                std::cerr << "Error: Identifier '" << token_val << "' not found in reverse_symbol_table.\n";
+            }
+        }
+        else if (match("num", tokens.getToken().type))
+        {
+            factor_addr = new_temp();                                                                                ////////////
+            three_address_code_file << factor_addr << " = " << string_token_val << "\n";                       ////////////
+        }
+        else if (match("(", tokens.getToken().val) && Mag(mag_addr) && match(")", tokens.getToken().val))
+        {
+            factor_addr = mag_addr;
+        }
+        else
+        {
+            result = false;
+        }
+
+        nodeStack.pop();
+        return result;
+    }
+};
+
+
+
 int main() {
-    Parser parser;
+
+    cout << "Analyzing Source Code...\n";
+    LexicalAnalyzer* sad = new LexicalAnalyzer("input.meow");
+    delete sad;
+
+    threeAddressCode parser;
     if (parser.parse()) {
         cout << "Accepted\n";
     }
@@ -1226,22 +1716,3 @@ int main() {
 
     return 0;
 }
-
-
-//int main() {
-//    
-//    cout << "Analyzing Source Code...\n";
-//    LexicalAnalyzer* sad = new LexicalAnalyzer("input.txt");
-//    delete sad;
-//
-//    TokenParser parser;
-//
-//    while (parser.areTokenLeft()) {
-//        Token t = parser.getToken();
-//        cout << "Type: " << t.type << ", Value: " << t.val << endl;
-//        parser.advance();
-//    }
-//
-//    
-//    return 0;
-//}

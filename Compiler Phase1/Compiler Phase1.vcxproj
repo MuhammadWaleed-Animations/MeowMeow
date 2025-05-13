@@ -138,6 +138,7 @@
     <Text Include="tokens.txt" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="input.meow" />
     <None Include="MeowMeow_Transitions.csv" />
     <None Include="table.py" />
   </ItemGroup>
